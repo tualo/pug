@@ -1,0 +1,24 @@
+{
+    "name": "tualo/pug",
+    "description": "Sample Module for tualo office",
+    "type": "library",
+    "license": "MIT",
+
+    "authors": [
+        {
+            "name": "Thomas Hoffmann",
+            "email": "thomas.hoffmann@tualo.de"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "tualo\\Office\\PUG\\": "src/"
+        },
+        "files": ["src/functions.php"]
+    },
+    "minimum-stability": "dev",
+    "require": {
+        "tualo/ds": "*",
+        "pug-php/pug": "^3.2"
+    }
+}
