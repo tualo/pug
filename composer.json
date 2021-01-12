@@ -12,7 +12,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "tualo\\Office\\PUG\\": "src/"
+            "Tualo\\Office\\PUG\\": "src/"
         },
         "files": ["src/functions.php"]
     },

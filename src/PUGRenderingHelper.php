@@ -1,8 +1,8 @@
 <?php 
-namespace tualo\Office\PUG;
+namespace Tualo\Office\PUG;
 use Pug\Pug;
-use tualo\Office\Basic\TualoApplication;
-use tualo\Office\DS\DS\DSReadRoute;
+use Tualo\Office\Basic\TualoApplication;
+use Tualo\Office\DS\DS\DSReadRoute;
 
 class PUGRenderingHelper{
 
@@ -49,7 +49,7 @@ class PUGRenderingHelper{
 
     public static function getPug(){
         $o = [        
-                'pretty' => false,
+                'pretty' => true,
                 'debug' => false,
                 'cache' => self::getPUGPath().'/cache/',
                 'cache_dir' => self::getPUGPath().'/cache/',
