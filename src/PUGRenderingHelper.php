@@ -3,6 +3,9 @@ namespace Tualo\Office\PUG;
 use Pug\Pug;
 use Tualo\Office\Basic\TualoApplication;
 use Tualo\Office\DS\DSReadRoute;
+use Tualo\Office\DS\DSRenderer;
+use Tualo\Office\DS\DSFileHelper;
+
 
 class PUGRenderingHelper{
 
