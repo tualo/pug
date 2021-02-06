@@ -9,6 +9,8 @@ use Tualo\Office\DS\DSFileHelper;
 
 class PUGRenderingHelper{
 
+    public static $maxDeep=10;
+
     public static function getPUGPath(){
         if (TualoApplication::get("pugCachePath")==''){
             TualoApplication::set("pugCachePath",TualoApplication::get("tempPath"));
@@ -56,7 +58,8 @@ class PUGRenderingHelper{
                 'debug' => false,
                 'cache' => self::getPUGPath().'/cache/',
                 'cache_dir' => self::getPUGPath().'/cache/',
-                'execution_max_time'=>3000000,
+                //'execution_max_time'=>3000000,
+                'execution_max_time'=>3000,
                 'upToDateCheck' => true,
                 'enable_profiler' => false,
                 'profiler' => [
@@ -80,27 +83,35 @@ class PUGRenderingHelper{
     }
 
 
-
+    
     public static function getIDArray($matches,$request){
-        $idlist = array();
+
+        $idlist = [];
         if(isset($matches['id'])){
             $id = $matches['id'];
-            $idlist = array($id);
+            $idlist = [$id];
         }else{
             if(isset($request['id'])){
                 if (is_array($request['id'])){
                     $idlist = $request['id'];
                 }else{
                     $idlist = json_decode($request['id'],true);
+                    if (is_null($idlist )){
+                        $idlist = [ $request['id'] ];
+                    }
                 }
             }
         }
+
+        
         return $idlist;
     }
 
     public static function domReplaceDS(&$doc,$idList,$template,$request){
         $items = $doc->getElementsByTagName('ds');
         $fnrequest = $request;
+
+
 
         $nodeListLength = $items->length; 
         for ($i =  $nodeListLength-1; $i >= 0; $i--) {
@@ -112,7 +123,6 @@ class PUGRenderingHelper{
             $localtemplate = $node->getAttribute('template');
             TualoApplication::timing("render_ds_".$localtemplate .' '.$tablename );
             
-
             if ($tablename){
                 $request = array(
                     'start' => 0,
@@ -152,9 +162,14 @@ class PUGRenderingHelper{
                 $request['sqlcache']=true;
                 
                 $db = TualoApplication::get('session')->getDB();
-                $read = DSReadRoute::read($db,$tablename,$request);
 
-            TualoApplication::timing("render_ds_".$localtemplate .' '.$tablename,/*$read*/ [] );
+
+            self::$maxDeep--;
+            if (self::$maxDeep==0) throw new \Exception("max deep reached $localtemplate $tablename");
+
+            $read = DSReadRoute::read($db,$tablename,$request);
+
+            TualoApplication::timing("render_ds_".$localtemplate .' '.$tablename, [] );
 
                 $read['definition'] = $db->direct('select column_name,label from ds_column_list_label where active=1 and hidden=0 and table_name={table_name} order by position',array('table_name'=>$tablename));
                 
@@ -176,17 +191,11 @@ class PUGRenderingHelper{
     //                                    $parent->appendChild($importedNode);
                             }
                         }
-    /*
-                        foreach($subitems as $subnode) {
-                            if ($importedNode = $doc->importNode($subnode->cloneNode(true),true)) {
-                                $parent->insertBefore($importedNode,$node->nextSibling);
-    //                                    $parent->appendChild($importedNode);
-                            }
-                        }
-    */
+    
                     }
                     
                 }
+
             }
             $parent->removeChild($node);
         }
@@ -464,6 +473,7 @@ class PUGRenderingHelper{
                     )
                 ));
                 if(isset($res['data']) && isset($res['data'][0]) && isset($res['data'][0][$tablename.'__'.$filecolumn])) $id = $res['data'][0][$tablename.'__'.$filecolumn];
+                if(false)
                 if ($id){
                     $mime = DSFileHelper::getFileMimeType($db,$tablename,$id);
                     if (isset($mime['mime'])){
@@ -605,6 +615,7 @@ class PUGRenderingHelper{
     }
 
     public static function render($idList,$template,$request){
+
         TualoApplication::appendTiming(true);
         TualoApplication::timing("render1",'');
         $data = $request;
@@ -612,7 +623,7 @@ class PUGRenderingHelper{
         if(!is_null($idList)&&isset($idList[0])) $data['idList'] = urldecode($idList[0]);
         $data['template'] = $template;
 
-        
+        set_time_limit(10);
 
         $db = TualoApplication::get('session')->getDB();
         $tablename = $request['tablename'];
@@ -651,6 +662,7 @@ class PUGRenderingHelper{
         $request['shortfieldnames']=1;
         $request['sqlcache']=true;
         $read = DSReadRoute::read($db,$tablename,$request);
+        
         $read['definition'] = $db->direct('select column_name,label from ds_column_list_label where active=1 and hidden=0 and table_name={table_name} order by position',array('table_name'=>$tablename));
         $data=array_merge($read,$data);
 
