@@ -616,6 +616,7 @@ class PUGRenderingHelper{
 
     public static function render($idList,$template,$request){
 
+
         TualoApplication::appendTiming(true);
         TualoApplication::timing("render1",'');
         $data = $request;
@@ -657,10 +658,11 @@ class PUGRenderingHelper{
         TualoApplication::timing("render css", '');
 
 
-        $request = array( 'start' => 0, 'limit' => 1000000, 'filter' => array(), 'sort' => array() );
-        $request['filter'][] = array( 'property'=> '__id', 'value'=> $idList, 'operator'=> 'in' );
+        $request = [ 'start' => 0, 'limit' => 1000000, 'filter' => array(), 'sort' => [] ];
+        $request['filter'][] = [ 'property'=> '__id', 'value'=> $idList, 'operator'=> 'in' ];
         $request['shortfieldnames']=1;
         $request['sqlcache']=true;
+        
         $read = DSReadRoute::read($db,$tablename,$request);
         
         $read['definition'] = $db->direct('select column_name,label from ds_column_list_label where active=1 and hidden=0 and table_name={table_name} order by position',array('table_name'=>$tablename));
@@ -669,6 +671,8 @@ class PUGRenderingHelper{
         $data=self::dataMerge($data);
         
         TualoApplication::timing("render before",'');
+
+
         $pug = self::getPug();
         try{
             $html = $pug->renderFile( self::getPUGPath().'/'.$template.'.pug',$data);
@@ -677,7 +681,7 @@ class PUGRenderingHelper{
                 return $html;
             }
         }catch(\Exception $e){
-            echo $e->getMessage();
+            TualoApplication::logger('error')->error($e->getMessage());
         }
 
         
