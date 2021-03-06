@@ -63,10 +63,10 @@ class PUGRenderingHelper{
                 'upToDateCheck' => true,
                 'enable_profiler' => false,
                 'profiler' => [
-                        'timeprecision' => 3,
-                        'lineheight'    => 30,
-                        'display'        => true,
-                        'log'            => false,
+                    'timeprecision' => 3,
+                    'lineheight'    => 30,
+                    'display'        => true,
+                    'log'            => false,
                 ]
         ];
 
@@ -617,8 +617,10 @@ class PUGRenderingHelper{
     public static function render($idList,$template,$request){
 
 
+        TualoApplication::timing("render0",'');
         TualoApplication::appendTiming(true);
         TualoApplication::timing("render1",'');
+
         $data = $request;
         $data['idList'] = '';
         if(!is_null($idList)&&isset($idList[0])) $data['idList'] = urldecode($idList[0]);
