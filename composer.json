@@ -19,6 +19,6 @@
     "minimum-stability": "dev",
     "require": {
         "tualo/ds": "*",
-        "pug-php/pug": "^3.2"
+        "pug-php/pug": "*"
     }
 }
