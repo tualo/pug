@@ -55,9 +55,9 @@ class PUGRenderingHelper{
     public static function getPug(){
         $o = [        
                 'pretty' => true,
-                'debug' => false,
-                'cache' => self::getPUGPath().'/cache/',
-                'cache_dir' => self::getPUGPath().'/cache/',
+                'debug' => true,
+                'cache' => dirname(self::getPUGPath()).'/cache',
+                'basedir' => self::getPUGPath(),
                 //'execution_max_time'=>3000000,
                 'execution_max_time'=>3000,
                 'upToDateCheck' => true,
@@ -675,7 +675,34 @@ class PUGRenderingHelper{
         TualoApplication::timing("render before",'');
 
 
+        self::cachePUGFiles();
         $pug = self::getPug();
+
+
+        $missingRequirements = array_keys(array_filter($pug->requirements(), function ($valid) {
+            return $valid === false;
+        }));
+        $missings = count($missingRequirements);
+        if ($missings) {
+            echo $missings . ' requirements are missing.<br />';
+            foreach ($missingRequirements as $requirement) {
+                switch($requirement) {
+                    case 'streamWhiteListed':
+                        echo 'Suhosin is enabled and ' . $pug->getOption('stream') . ' is not in suhosin.executor.include.whitelist, please add it to your php.ini file.<br />';
+                        break;
+                    case 'cacheFolderExists':
+                        echo 'The cache folder does not exists, please enter in a command line : <code>mkdir -p ' . $pug->getOption('cache') . '</code>.<br />';
+                        break;
+                    case 'cacheFolderIsWritable':
+                        echo 'The cache folder is not writable, please enter in a command line : <code>chmod -R +w ' . $pug->getOption('cache') . '</code>.<br />';
+                        break;
+                    default:
+                        echo $requirement . ' is false.<br />';
+                }
+            }
+            exit(1);
+        }
+
         try{
             $html = $pug->renderFile( self::getPUGPath().'/'.$template.'.pug',$data);
             TualoApplication::timing("render after",'');
