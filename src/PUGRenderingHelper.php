@@ -675,8 +675,9 @@ class PUGRenderingHelper{
         TualoApplication::timing("render before",'');
 
 
-        self::cachePUGFiles();
+        //self::cachePUGFiles();
         $pug = self::getPug();
+        TualoApplication::timing("render self pug",'')
 
 
         $missingRequirements = array_keys(array_filter($pug->requirements(), function ($valid) {
@@ -710,6 +711,7 @@ class PUGRenderingHelper{
                 return $html;
             }
         }catch(\Exception $e){
+            $html=$e->getMessage();
             TualoApplication::logger('error')->error($e->getMessage());
         }
 
