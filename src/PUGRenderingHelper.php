@@ -16,6 +16,12 @@ class Request{
 
 class PUGRenderingHelper{
 
+    public static function datetime():mixed{
+        return function(string $dt):mixed{
+            return (new \DateTime($dt));
+        };
+    }
+
     public static $maxDeep=10;
 
     public static function getPUGPath():string{
@@ -682,6 +688,7 @@ class PUGRenderingHelper{
         $db = TualoApplication::get('session')->getDB();
         $data['ds']= new DS($db);
         $data['request']= new Request();
+        $data['datetime']=self::datetime();
 
         
 
