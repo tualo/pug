@@ -7,6 +7,12 @@ use Tualo\Office\DS\DSRenderer;
 use Tualo\Office\DS\DS;
 use Tualo\Office\DS\DSFileHelper;
 
+class Request{
+    public function get(string $key):mixed{
+        if (!isset($_REQUEST[$key])) return false;
+        return $_REQUEST[$key];
+    }
+}
 
 class PUGRenderingHelper{
 
@@ -675,7 +681,10 @@ class PUGRenderingHelper{
         
         $db = TualoApplication::get('session')->getDB();
         $data['ds']= new DS($db);
+        $data['request']= new Request();
+
         
+
         TualoApplication::timing("render before",'');
 
 
