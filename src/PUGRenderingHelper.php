@@ -4,6 +4,7 @@ use Pug\Pug;
 use Tualo\Office\Basic\TualoApplication;
 use Tualo\Office\DS\DSReadRoute;
 use Tualo\Office\DS\DSRenderer;
+use Tualo\Office\DS\DS;
 use Tualo\Office\DS\DSFileHelper;
 
 
@@ -11,11 +12,11 @@ class PUGRenderingHelper{
 
     public static $maxDeep=10;
 
-    public static function getPUGPath(){
+    public static function getPUGPath():string{
         if (TualoApplication::get("pugCachePath")==''){
             TualoApplication::set("pugCachePath",TualoApplication::get("tempPath"));
         }
-        return TualoApplication::get("pugCachePath");
+        return (string)TualoApplication::get("pugCachePath");
     }
 
     public static function file_put_contents($fn,$data){
@@ -587,8 +588,8 @@ class PUGRenderingHelper{
         $data=self::dataMerge($data);
         
         
-        
-        
+        $db = TualoApplication::get('session')->getDB();
+        $data['ds']= new DS($db);
 
         
         $pug = self::getPug();
