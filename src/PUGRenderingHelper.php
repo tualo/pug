@@ -673,6 +673,9 @@ class PUGRenderingHelper{
 
         $data=self::dataMerge($data);
         
+        $db = TualoApplication::get('session')->getDB();
+        $data['ds']= new DS($db);
+        
         TualoApplication::timing("render before",'');
 
 
