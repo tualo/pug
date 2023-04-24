@@ -19,6 +19,7 @@
     "minimum-stability": "dev",
     "require": {
         "tualo/ds": "*",
+        "dompdf/dompdf": "*",
         "pug-php/pug": "*"
     }
 }
