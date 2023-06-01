@@ -5,6 +5,7 @@ use Tualo\Office\Basic\TualoApplication;
 use Tualo\Office\DS\DSReadRoute;
 use Tualo\Office\DS\DSRenderer;
 use Tualo\Office\DS\DS;
+use Tualo\Office\DS\DSTable;
 use Tualo\Office\DS\DSFileHelper;
 
 class Request{
@@ -725,6 +726,7 @@ class PUGRenderingHelper{
         }
 
         try{
+            $data['ds'] = DSTable::init($db);
             $html = $pug->renderFile( self::getPUGPath().'/'.$template.'.pug',$data);
             TualoApplication::timing("render after",'');
             if (empty(trim(chop($html)))){
