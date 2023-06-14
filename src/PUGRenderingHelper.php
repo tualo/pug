@@ -63,7 +63,7 @@ class PUGRenderingHelper{
             "ds(tablename=tablename,template=template)\n    dsfilter(property=\"__id\",operator=\"eq\",value=idList)"
         )) $list[] = self::getPUGPath().'/___init.pug';
 
-        // self::cachePUGFiles();
+        self::cachePUGFiles();
     }
 
     public static function getPug(){
