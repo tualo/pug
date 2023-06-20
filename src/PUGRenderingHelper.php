@@ -55,16 +55,12 @@ class PUGRenderingHelper{
         if(!file_exists( self::getPUGPath().'/checksum' ))  file_put_contents( self::getPUGPath().'/checksum',md5('') );
 
         $checksum = file_get_contents( self::getPUGPath().'/checksum');
-
         $dbchecksum = $db->singleValue('checksum table ds_pug_templates',[],'checksum');
-
         if ($checksum==$dbchecksum) return; 
 
+
         TualoApplication::logger('PUG')->info("checksum is diffrent old $checksum new $dbchecksum > export pug files",[$db->dbname]);
-
         file_put_contents( self::getPUGPath().'/checksum',$dbchecksum );
-
-
         $data = $db->direct('select id,template from ds_pug_templates');
         $list=[];
         foreach($data as $row){
