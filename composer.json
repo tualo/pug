@@ -20,6 +20,8 @@
     "require": {
         "tualo/ds": "*",
         "dompdf/dompdf": "*",
-        "pug-php/pug": "*"
+        "pug-php/pug": "*",
+        "chillerlan/php-qrcode": "*",
+        "picqer/php-barcode-generator": "*"
     }
 }

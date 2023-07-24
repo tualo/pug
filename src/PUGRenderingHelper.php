@@ -260,6 +260,7 @@ class PUGRenderingHelper{
                             }else{
                                 $subhtml = '<span>QRCode lib not installed</span>';
                             }
+                            
                             $subdoc = new \DOMDocument();
                             if (!empty(trim(chop($subhtml)))){
                                 $subdoc->loadHTML('<?xml encoding="utf-8" ?>'.$subhtml,LIBXML_NOWARNING);
