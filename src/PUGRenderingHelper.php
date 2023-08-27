@@ -7,13 +7,8 @@ use Tualo\Office\DS\DSRenderer;
 use Tualo\Office\DS\DS;
 use Tualo\Office\DS\DSTable;
 use Tualo\Office\DS\DSFileHelper;
+use Tualo\Office\PUG\Request;
 
-class Request{
-    public function get(string $key):mixed{
-        if (!isset($_REQUEST[$key])) return false;
-        return $_REQUEST[$key];
-    }
-}
 
 class PUGRenderingHelper{
 
