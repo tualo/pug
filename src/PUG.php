@@ -4,11 +4,6 @@ use Pug\Pug as P;
 use Tualo\Office\Basic\TualoApplication;
 use Tualo\Office\PUG\Request;
 
-use Tualo\Office\DS\DSReadRoute;
-use Tualo\Office\DS\DSRenderer;
-use Tualo\Office\DS\DS;
-use Tualo\Office\DS\DSTable;
-use Tualo\Office\DS\DSFileHelper;
 
 
 class PUG {
