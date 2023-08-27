@@ -68,11 +68,12 @@ class PUG {
             $data
             );
         }
-        $data = [
+
+        $o = [
             'request' => new Request(),
             'datetime' => self::datetime()
         ];
-        return $data;
+        return array_merge($o,$data);
     }
 
     public static function render(string $template,array $data=[],array $options=[]):string{
@@ -81,10 +82,10 @@ class PUG {
                 return file_exists( self::getPUGPath().'/'.$template.'.pug');
         };
         $data['includeTemplate'] = function($template,$data,$parentData=[]) use ($pug){
-                $data['parent'] = $parentData;
-                return $pug->renderFile( self::getPUGPath().'/'.$template.'.pug',self::data($data));
+                // $data['parent'] = $parentData;
+                return $pug->renderFile( self::getPUGPath().'/'.$template.'.pug', self::data($data));
         };
-        $html = $pug->renderFile( self::getPUGPath().'/'.$template.'.pug',self::data($data));
+        $html = $pug->renderFile( self::getPUGPath().'/'.$template.'.pug',  self::data($data));
         return $html;
     }
 }

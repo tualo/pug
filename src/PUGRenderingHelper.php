@@ -8,6 +8,7 @@ use Tualo\Office\DS\DS;
 use Tualo\Office\DS\DSTable;
 use Tualo\Office\DS\DSFileHelper;
 use Tualo\Office\PUG\Request;
+use chillerlan\QRCode\QRCode;
 
 
 class PUGRenderingHelper{
@@ -251,7 +252,7 @@ class PUGRenderingHelper{
 
                             // composer require chillerlan/php-qrcode
                             if (class_exists("chillerlan\QRCode\QRCode")){
-                                $subhtml = '<img src="'.(new chillerlan\QRCode\QRCode)->render($data).'" '.$xattr.' />';
+                                $subhtml = '<img src="'.(new QRCode)->render($data).'" '.$xattr.' />';
                             }else{
                                 $subhtml = '<span>QRCode lib not installed</span>';
                             }
