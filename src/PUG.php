@@ -24,9 +24,14 @@ class PUG {
         TualoApplication::logger('PUG')->info("checksum is diffrent old $checksum new $dbchecksum > export pug files",[$db->dbname]);
         file_put_contents( self::getPUGPath().'/checksum',$dbchecksum );
         $data = $db->direct('select id,template from ds_pug_templates');
+        // $dynamic = 'mixin dynamic_import(template)'."\n";
+        // $dynamic .= "\t".'case template'."\n";
         foreach($data as $row){
             file_put_contents( self::getPUGPath().'/'.$row['id'].'.pug',$row['template'] );
+            // $dynamic .= "\t"."\t".'when "'.$row['id'].'" '."\n";
+            // $dynamic .= "\t"."\t"."\t".'include '.$row['id'].''."\n";
         }
+        // file_put_contents( self::getPUGPath().'/dynamic_import.pug',$dynamic );
     }
 
     public static function getPug($options=[]): P{
