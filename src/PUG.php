@@ -83,6 +83,7 @@ class PUG {
         };
         $data['includeTemplate'] = function($template,$data,$parentData=[]) use ($pug){
                 // $data['parent'] = $parentData;
+                $data = array_merge($parentData,$data);
                 return $pug->renderFile( self::getPUGPath().'/'.$template.'.pug', self::data($data));
         };
         $html = $pug->renderFile( self::getPUGPath().'/'.$template.'.pug',  self::data($data));
