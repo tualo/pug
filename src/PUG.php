@@ -17,7 +17,7 @@ class PUG {
         if(!file_exists( self::getPUGPath() )) mkdir( self::getPUGPath() ,0777);
         if(!file_exists( self::getPUGPath().'/checksum' ))  file_put_contents( self::getPUGPath().'/checksum',md5('') );
         $checksum = file_get_contents( self::getPUGPath().'/checksum');
-        $dbchecksum = $db->singleValue('checksum table ds_pug_templates',[],'checksum');
+        $dbchecksum = $db->singleValue('select md5( group_concat( md5(ds_pug_templates.template) separator "")) checksum  from ds_pug_templates',[],'checksum');
         if ($checksum==$dbchecksum) return; 
 
 
