@@ -1,5 +1,7 @@
 <?php
 namespace Tualo\Office\PUG\Routes;
+
+use Exception;
 use Tualo\Office\Basic\TualoApplication;
 use Tualo\Office\Basic\Route;
 use Tualo\Office\Basic\IRoute;
@@ -34,6 +36,7 @@ class PDF implements IRoute{
 
         Route::add('/pugreporthtml/(?P<tablename>[\w\-\_]+)/(?P<template>[\w\-\_]+)/(?P<id>.+)',function($matches){
 
+            try{
             ini_set('memory_limit','4096M');
             $db = TualoApplication::get('session')->getDB();
             TualoApplication::contenttype('text/html');
@@ -56,6 +59,9 @@ class PDF implements IRoute{
             $html = PUGRenderingHelper::render([$id], $template, $_REQUEST);
             TualoApplication::body($html);
             Route::$finished=true;
+        }catch(Exception $e){
+            TualoApplication::body($e->getMessage());
+        }
 
         },array('get','post'),true);
 

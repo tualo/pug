@@ -19,7 +19,7 @@ class PUGRenderingHelper{
         };
     }
 
-    public static $maxDeep=10;
+    public static $maxDeep=100;
 
     public static function getPUGPath():string{
         if (TualoApplication::get("pugCachePath")==''){
