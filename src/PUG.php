@@ -36,7 +36,7 @@ class PUG {
                 'cache' => dirname(self::getPUGPath()).'/cache',
                 'basedir' => self::getPUGPath(),
                 //'execution_max_time'=>3000000,
-                'execution_max_time'=>3000,
+                'execution_max_time'=>30000,
                 'upToDateCheck' => true,
                 'enable_profiler' => false,
                 'profiler' => [
