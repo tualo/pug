@@ -7,31 +7,14 @@ use Tualo\Office\Basic\Route;
 use Tualo\Office\Basic\IRoute;
 use Tualo\Office\PUG\DomPDFRenderingHelper;
 use Tualo\Office\PUG\PUGRenderingHelper;
+use Tualo\Office\PUG\PDF as P;
 
 class PDF implements IRoute{
     public static function register(){
 
         
         Route::add('/pugreportpdf/(?P<tablename>[\w\-\_]+)/(?P<template>[\w\-\_]+)/(?P<id>.+)',function($matches){
-
-            ini_set('memory_limit','4096M');
-            $db = TualoApplication::get('session')->getDB();
-            TualoApplication::contenttype('application/pdf');
-    
-            $_REQUEST['tablename']=$matches['tablename'];
-    
-            set_time_limit(600);
-            
-            if (!file_exists(TualoApplication::get("basePath").'/cache/'.$db->dbname)){
-                mkdir(TualoApplication::get("basePath").'/cache/'.$db->dbname);
-            }
-            if (!file_exists(TualoApplication::get("basePath").'/cache/'.$db->dbname.'/ds')){
-                mkdir(TualoApplication::get("basePath").'/cache/'.$db->dbname.'/ds');
-            }
-            $GLOBALS['pug_cache']=TualoApplication::get("basePath").'/cache/'.$db->dbname.'/ds';
-                
-            DomPDFRenderingHelper::render($matches,$_REQUEST);
-            
+            P::get($matches['tablename'],$matches['template'],$matches['id']);
         },array('get','post'),true);
 
         Route::add('/pugreporthtml/(?P<tablename>[\w\-\_]+)/(?P<template>[\w\-\_]+)/(?P<id>.+)',function($matches){

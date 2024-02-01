@@ -79,12 +79,11 @@ class PUG {
     public static function render(string $template,array $data=[],array $options=[]):string{
         $pug = self::getPug($options);
         $data['hasTemplate'] = function($template) use ($pug){
-                return file_exists( self::getPUGPath().'/'.$template.'.pug');
+            return file_exists( self::getPUGPath().'/'.$template.'.pug');
         };
         $data['includeTemplate'] = function($template,$data,$parentData=[]) use ($pug){
-                // $data['parent'] = $parentData;
-                $data = array_merge($parentData,$data);
-                return $pug->renderFile( self::getPUGPath().'/'.$template.'.pug', self::data($data));
+            $data = array_merge($parentData,$data);
+            return $pug->renderFile( self::getPUGPath().'/'.$template.'.pug', self::data($data));
         };
         $html = $pug->renderFile( self::getPUGPath().'/'.$template.'.pug',  self::data($data));
         return $html;
