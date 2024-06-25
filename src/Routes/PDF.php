@@ -8,6 +8,7 @@ use Tualo\Office\Basic\IRoute;
 use Tualo\Office\PUG\DomPDFRenderingHelper;
 use Tualo\Office\PUG\PUGRenderingHelper;
 use Tualo\Office\PUG\PDF as P;
+use Tualo\Office\PUG\PUG as PUG;
 
 class PDF implements IRoute{
     public static function register(){
@@ -19,32 +20,42 @@ class PDF implements IRoute{
 
         Route::add('/pugreporthtml/(?P<tablename>[\w\-\_]+)/(?P<template>[\w\-\_]+)/(?P<id>.+)',function($matches){
 
-            try{
-            ini_set('memory_limit','4096M');
-            $db = TualoApplication::get('session')->getDB();
-            TualoApplication::contenttype('text/html');
-    
-            $_REQUEST['tablename']=$matches['tablename'];
-    
-            set_time_limit(600);
-            
-            if (!file_exists(TualoApplication::get("basePath").'/cache/'.$db->dbname)){
-                mkdir(TualoApplication::get("basePath").'/cache/'.$db->dbname);
-            }
-            if (!file_exists(TualoApplication::get("basePath").'/cache/'.$db->dbname.'/ds')){
-                mkdir(TualoApplication::get("basePath").'/cache/'.$db->dbname.'/ds');
-            }
-            $GLOBALS['pug_cache']=TualoApplication::get("basePath").'/cache/'.$db->dbname.'/ds';
+                try{
+
+                    /*
+                ini_set('memory_limit','4096M');
+                $db = TualoApplication::get('session')->getDB();
+        
+                $_REQUEST['tablename']=$matches['tablename'];
+        
+                set_time_limit(600);
                 
-            PUGRenderingHelper::exportPUG($db);
-            $template = $matches['template'];
-            $id = $matches['id'];
-            $html = PUGRenderingHelper::render([$id], $template, $_REQUEST);
-            TualoApplication::body($html);
-            Route::$finished=true;
-        }catch(Exception $e){
-            TualoApplication::body($e->getMessage());
-        }
+                if (!file_exists(TualoApplication::get("basePath").'/cache/'.$db->dbname)){
+                    mkdir(TualoApplication::get("basePath").'/cache/'.$db->dbname);
+                }
+                if (!file_exists(TualoApplication::get("basePath").'/cache/'.$db->dbname.'/ds')){
+                    mkdir(TualoApplication::get("basePath").'/cache/'.$db->dbname.'/ds');
+                }
+                $GLOBALS['pug_cache']=TualoApplication::get("basePath").'/cache/'.$db->dbname.'/ds';
+                    
+                PUGRenderingHelper::exportPUG($db);
+                $template = $matches['template'];
+                $id = $matches['id'];
+                $html = PUGRenderingHelper::render([$id], $template, $_REQUEST);
+                */
+
+                TualoApplication::contenttype('text/html');
+                $table =\Tualo\Office\DS\DSTable::instance($matches['tablename']);
+                $table->f('__id','=',$matches['id']);
+                $data = $table->read()->get();
+                $_REQUEST['data']=$data;
+
+                $html = PUG::render($matches['template'],$_REQUEST);
+                TualoApplication::body($html);
+                Route::$finished=true;
+            }catch(Exception $e){
+                TualoApplication::body($e->getMessage());
+            }
 
         },array('get','post'),true);
 

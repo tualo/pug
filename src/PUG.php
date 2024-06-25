@@ -32,7 +32,7 @@ class PUG {
     public static function getPug($options=[]): P{
         $o = [        
                 'pretty' => true,
-                'debug' => true,
+                'debug' => TualoApplication::configuration('pug','debug','0')==1,
                 'cache' => dirname(self::getPUGPath()).'/cache',
                 'basedir' => self::getPUGPath(),
                 //'execution_max_time'=>3000000,
@@ -68,10 +68,12 @@ class PUG {
             $data
             );
         }
-
+        $http = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on'? "https://" : "http://";
+        $url = $http . $_SERVER["SERVER_NAME"] . dirname($_SERVER['SCRIPT_NAME']).'/';
         $o = [
             'request' => new Request(),
-            'datetime' => self::datetime()
+            'datetime' => self::datetime(),
+            'baseURL' => $url
         ];
         return array_merge($o,$data);
     }
