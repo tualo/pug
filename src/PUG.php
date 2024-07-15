@@ -81,8 +81,10 @@ class PUG {
     public static function render(string $template,array $data=[],array $options=[]):string{
         $pug = self::getPug($options);
 
+        self::exportPUG(TualoApplication::get('session')->getDB());
+
         $css =\Tualo\Office\DS\DSTable::instance('ds_renderer_stylesheet_groups_assign');
-        $data['stylesheets'] = $css->f('active','=',1)->f('pug_id','=',$template)->read();
+        $data['stylesheets'] = $css->f('active','=',1)->f('pug_id','=',$template)->read()->get();
 
         $data['hasTemplate'] = function($template) use ($pug){
             return file_exists( self::getPUGPath().'/'.$template.'.pug');

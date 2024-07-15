@@ -50,6 +50,7 @@ class PDF implements IRoute{
                 $data = $table->read()->get();
                 $_REQUEST['data']=$data;
 
+        
                 $html = PUG::render($matches['template'],$_REQUEST);
                 TualoApplication::body($html);
                 Route::$finished=true;
