@@ -13,6 +13,7 @@ class PDF {
         TualoApplication::contenttype('application/pdf');
 
         $_REQUEST['tablename']=$tablename;
+        $_REQUEST['id']=$id;
         $matches=[
             'tablename'=>$tablename,
             'template'=>$template,

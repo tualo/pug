@@ -49,6 +49,8 @@ class PDF implements IRoute{
                 $table->f('__id','=',$matches['id']);
                 $data = $table->read()->get();
                 $_REQUEST['data']=$data;
+                $_REQUEST['id']=$matches['id'];
+                
 
         
                 $html = PUG::render($matches['template'],$_REQUEST);
