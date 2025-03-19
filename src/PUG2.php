@@ -100,13 +100,35 @@ class PUG2
         if (is_null($stylesheets))
             $stylesheets = [];
 
-        $fn = function ($tn) {
-            return T::instance($tn);
-        };
+
         return $pug->renderFile($template, [
             'data' => $data,
             'stylesheets' => $stylesheets,
-            'dstable' =>  $fn
+            'datetime' => self::datetime(),
+            'base64file' => self::base64file(),
+            'dstable' =>  self::dstable(),
         ]);
+    }
+
+
+    public static function base64file(): callable
+    {
+        return function (string $tablename, string $value, string $field = '__filename'): string {
+            return \Tualo\Office\DS\DSFiles::instance($tablename)->getBase64($field, $value, true);
+        };
+    }
+
+    public static function dstable(): callable
+    {
+        return function ($tn): \Tualo\Office\DS\DSTable {
+            return \Tualo\Office\DS\DSTable::instance($tn);
+        };
+    }
+
+    public static function datetime(): callable
+    {
+        return function (string $dt): \DateTime {
+            return (new \DateTime($dt));
+        };
     }
 }

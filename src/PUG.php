@@ -59,10 +59,25 @@ class PUG
         return new P($o);
     }
 
-    public static function datetime(): mixed
+    public static function datetime(): callable
     {
-        return function (string $dt): mixed {
+        return function (string $dt): \DateTime {
             return (new \DateTime($dt));
+        };
+    }
+
+
+    public static function base64file(): callable
+    {
+        return function (string $tablename, string $value, string $field = '__filename'): string {
+            return \Tualo\Office\DS\DSFiles::instance($tablename)->getBase64($field, $value, true);
+        };
+    }
+
+    public static function dstable(): callable
+    {
+        return function ($tn): \Tualo\Office\DS\DSTable {
+            return \Tualo\Office\DS\DSTable::instance($tn);
         };
     }
 
@@ -81,12 +96,10 @@ class PUG
         $o = [
             'request' => new Request(),
             'datetime' => self::datetime(),
+            'base64file' => self::base64file(),
+            'dstable' => self::dstable(),
             'baseURL' => $url
         ];
-        $fn = function ($tn) {
-            return \Tualo\Office\DS\DSTable::instance($tn);
-        };
-        $o['dstable'] = $fn;
         return array_merge($o, $data);
     }
 
