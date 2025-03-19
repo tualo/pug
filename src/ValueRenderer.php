@@ -7,6 +7,11 @@ class ValueRenderer
 
     public function render(string $type, mixed $value): string
     {
+
+        if (is_null($value)) {
+            return '';
+        }
+
         if ($type == 'euroRenderer') {
             return $this->euroRenderer($value);
         }
@@ -34,9 +39,7 @@ class ValueRenderer
         if ($type == 'deDate') {
             return $this->deDate($value);
         }
-        if (is_null($value)) {
-            return '';
-        }
+
 
         if ($type == '') {
             return $value;
