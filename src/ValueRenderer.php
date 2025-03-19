@@ -34,6 +34,9 @@ class ValueRenderer
         if ($type == 'deDate') {
             return $this->deDate($value);
         }
+        if (is_null($value)) {
+            return '';
+        }
 
         if ($type == '') {
             return $value;
