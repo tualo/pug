@@ -81,6 +81,20 @@ class PUG
         };
     }
 
+    public static function keysort(): callable
+    {
+        return function (array $data, string $key, string $direction = 'asc'): array {
+            usort($data, function ($a, $b) use ($key, $direction) {
+                if ($direction == 'asc') {
+                    return $a[$key] <=> $b[$key];
+                } else {
+                    return $b[$key] <=> $a[$key];
+                }
+            });
+            return $data;
+        };
+    }
+
     public static function data($data)
     {
         if (isset($_SESSION['pug_session'])) {
@@ -98,6 +112,7 @@ class PUG
             'datetime' => self::datetime(),
             'base64file' => self::base64file(),
             'dstable' => self::dstable(),
+            'keysort' => self::keysort(),
             'baseURL' => $url
         ];
         return array_merge($o, $data);

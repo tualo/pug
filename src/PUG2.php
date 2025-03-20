@@ -106,6 +106,7 @@ class PUG2
             'stylesheets' => $stylesheets,
             'datetime' => self::datetime(),
             'base64file' => self::base64file(),
+            'keysort' => self::keysort(),
             'dstable' =>  self::dstable(),
         ]);
     }
@@ -129,6 +130,20 @@ class PUG2
     {
         return function (string $dt): \DateTime {
             return (new \DateTime($dt));
+        };
+    }
+
+    public static function keysort(): callable
+    {
+        return function (array $data, string $key, string $direction = 'asc'): array {
+            usort($data, function ($a, $b) use ($key, $direction) {
+                if ($direction == 'asc') {
+                    return $a[$key] <=> $b[$key];
+                } else {
+                    return $b[$key] <=> $a[$key];
+                }
+            });
+            return $data;
         };
     }
 }
