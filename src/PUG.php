@@ -109,6 +109,7 @@ class PUG
         $url = $http . $_SERVER["SERVER_NAME"] . dirname($_SERVER['SCRIPT_NAME']) . '/';
         $o = [
             'request' => new Request(),
+            'relocate' => new Relocate(),
             'datetime' => self::datetime(),
             'base64file' => self::base64file(),
             'dstable' => self::dstable(),

@@ -106,6 +106,8 @@ class PUG2
             'stylesheets' => $stylesheets,
             'datetime' => self::datetime(),
             'base64file' => self::base64file(),
+            'request' => new Request(),
+            'relocate' => new Relocate(),
             'keysort' => self::keysort(),
             'dstable' =>  self::dstable(),
         ]);
