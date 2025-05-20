@@ -114,10 +114,19 @@ class PUG
             'base64file' => self::base64file(),
             'dstable' => self::dstable(),
             'keysort' => self::keysort(),
-            'baseURL' => $url
+            'baseURL' => $url,
+            'pug' => self::pugFN(),
         ];
         return array_merge($o, $data);
     }
+
+    public static function pugFN(): callable
+    {
+        return function ($options = []): PUG2 {
+            return new PUG2(TualoApplication::get('session')->getDB(), $options);
+        };
+    }
+
 
     public static function render(string $template, array $data = [], array $options = []): string
     {

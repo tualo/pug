@@ -110,6 +110,7 @@ class PUG2
             'relocate' => new Relocate(),
             'keysort' => self::keysort(),
             'dstable' =>  self::dstable(),
+            'pug' =>  self::pugFN(),
         ]);
     }
 
@@ -118,6 +119,13 @@ class PUG2
     {
         return function (string $tablename, string $value, string $field = '__filename'): string {
             return \Tualo\Office\DS\DSFiles::instance($tablename)->getBase64($field, $value, true);
+        };
+    }
+
+    public static function pugFN(): callable
+    {
+        return function ($options = []): PUG2 {
+            return new PUG2($this->db, $options);
         };
     }
 
