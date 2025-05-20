@@ -1,5 +1,7 @@
-<?php 
+<?php
+
 namespace Tualo\Office\PUG;
+
 use Pug\Pug;
 use Tualo\Office\Basic\TualoApplication;
 use Tualo\Office\DS\DSReadRoute;
@@ -11,138 +13,152 @@ use Tualo\Office\PUG\Request;
 use chillerlan\QRCode\QRCode;
 
 
-class PUGRenderingHelper{
+class PUGRenderingHelper
+{
 
-    public static function datetime():mixed{
-        return function(string $dt):mixed{
+    public static function dstable(): callable
+    {
+        return function ($tn): \Tualo\Office\DS\DSTable {
+            return \Tualo\Office\DS\DSTable::instance($tn);
+        };
+    }
+
+    public static function datetime(): mixed
+    {
+        return function (string $dt): mixed {
             return (new \DateTime($dt));
         };
     }
 
-    public static $maxDeep=100;
+    public static $maxDeep = 100;
 
-    public static function getPUGPath():string{
-        if (TualoApplication::get("pugCachePath")==''){
-            TualoApplication::set("pugCachePath",TualoApplication::get("tempPath"));
+    public static function getPUGPath(): string
+    {
+        if (TualoApplication::get("pugCachePath") == '') {
+            TualoApplication::set("pugCachePath", TualoApplication::get("tempPath"));
         }
         return (string)TualoApplication::get("pugCachePath");
     }
 
-    public static function file_put_contents($fn,$data){
-        $write=false;
-        if (file_exists($fn)){
-            if (file_get_contents($fn)!=$data){
-                $write=true;
+    public static function file_put_contents($fn, $data)
+    {
+        $write = false;
+        if (file_exists($fn)) {
+            if (file_get_contents($fn) != $data) {
+                $write = true;
             }
-
-        }else{
-            $write=true;
+        } else {
+            $write = true;
         }
-        if ($write==true){
-            file_put_contents($fn,$data);
-            
+        if ($write == true) {
+            file_put_contents($fn, $data);
         }
         return $write;
     }
 
-    public static function exportPUG($db){
-        
-        if(!file_exists( self::getPUGPath() )) mkdir( self::getPUGPath() ,0777);
-        if(!file_exists( self::getPUGPath().'/checksum' ))  file_put_contents( self::getPUGPath().'/checksum',md5('') );
+    public static function exportPUG($db)
+    {
 
-        $checksum = file_get_contents( self::getPUGPath().'/checksum');
-        $dbchecksum = $db->singleValue('checksum table ds_pug_templates',[],'checksum');
-        if ($checksum==$dbchecksum) return; 
+        if (!file_exists(self::getPUGPath())) mkdir(self::getPUGPath(), 0777);
+        if (!file_exists(self::getPUGPath() . '/checksum'))  file_put_contents(self::getPUGPath() . '/checksum', md5(''));
+
+        $checksum = file_get_contents(self::getPUGPath() . '/checksum');
+        $dbchecksum = $db->singleValue('checksum table ds_pug_templates', [], 'checksum');
+        if ($checksum == $dbchecksum) return;
 
 
-        TualoApplication::logger('PUG')->info("checksum is diffrent old $checksum new $dbchecksum > export pug files",[$db->dbname]);
-        file_put_contents( self::getPUGPath().'/checksum',$dbchecksum );
+        TualoApplication::logger('PUG')->info("checksum is diffrent old $checksum new $dbchecksum > export pug files", [$db->dbname]);
+        file_put_contents(self::getPUGPath() . '/checksum', $dbchecksum);
         $data = $db->direct('select id,template from ds_pug_templates');
-        $list=[];
-        foreach($data as $row){
-            if (self::file_put_contents( self::getPUGPath().'/'.$row['id'].'.pug',$row['template'] )) $list[] = self::getPUGPath().'/___init.pug';
+        $list = [];
+        foreach ($data as $row) {
+            if (self::file_put_contents(self::getPUGPath() . '/' . $row['id'] . '.pug', $row['template'])) $list[] = self::getPUGPath() . '/___init.pug';
         }
-        
-        if (self::file_put_contents( 
-            self::getPUGPath().'/___init.pug',
+
+        if (self::file_put_contents(
+            self::getPUGPath() . '/___init.pug',
             "ds(tablename=tablename,template=template)\n    dsfilter(property=\"__id\",operator=\"eq\",value=idList)"
-        )) $list[] = self::getPUGPath().'/___init.pug';
+        )) $list[] = self::getPUGPath() . '/___init.pug';
 
         self::cachePUGFiles();
     }
 
-    public static function getPug(){
-        $o = [        
-                'pretty' => true,
-                'debug' => true,
-                'cache' => dirname(self::getPUGPath()).'/cache',
-                'basedir' => self::getPUGPath(),
-                //'execution_max_time'=>3000000,
-                'execution_max_time'=>30000,
-                'upToDateCheck' => true,
-                'enable_profiler' => false,
-                'profiler' => [
-                    'timeprecision' => 3,
-                    'lineheight'    => 30,
-                    'display'        => true,
-                    'log'            => false,
-                ]
+    public static function getPug()
+    {
+        $o = [
+            'pretty' => true,
+            'debug' => true,
+            'cache' => dirname(self::getPUGPath()) . '/cache',
+            'basedir' => self::getPUGPath(),
+            //'execution_max_time'=>3000000,
+            'execution_max_time' => 30000,
+            'upToDateCheck' => true,
+            'enable_profiler' => false,
+            'profiler' => [
+                'timeprecision' => 3,
+                'lineheight'    => 30,
+                'display'        => true,
+                'log'            => false,
+            ]
         ];
 
-        if (isset($GLOBALS['pug_formats'])){
-            $o['formats']=$GLOBALS['pug_formats'];
+        if (isset($GLOBALS['pug_formats'])) {
+            $o['formats'] = $GLOBALS['pug_formats'];
         }
 
         return new Pug($o);
     }
 
-    public static function cachePUGFiles(){
+    public static function cachePUGFiles()
+    {
         $pug = self::getPug();
         list($success, $errors) = $pug->cacheDirectory(self::getPUGPath());
     }
 
 
-    
-    public static function getIDArray($matches,$request){
+
+    public static function getIDArray($matches, $request)
+    {
 
         $idlist = [];
-        if(isset($matches['id'])){
+        if (isset($matches['id'])) {
             $id = $matches['id'];
             $idlist = [$id];
-        }else{
-            if(isset($request['id'])){
-                if (is_array($request['id'])){
+        } else {
+            if (isset($request['id'])) {
+                if (is_array($request['id'])) {
                     $idlist = $request['id'];
-                }else{
-                    $idlist = json_decode($request['id'],true);
-                    if (is_null($idlist )){
-                        $idlist = [ $request['id'] ];
+                } else {
+                    $idlist = json_decode($request['id'], true);
+                    if (is_null($idlist)) {
+                        $idlist = [$request['id']];
                     }
                 }
             }
         }
 
-        
+
         return $idlist;
     }
 
-    public static function domReplaceDS(&$doc,$idList,$template,$request){
+    public static function domReplaceDS(&$doc, $idList, $template, $request)
+    {
         $items = $doc->getElementsByTagName('ds');
         $fnrequest = $request;
 
 
 
-        $nodeListLength = $items->length; 
-        for ($i =  $nodeListLength-1; $i >= 0; $i--) {
+        $nodeListLength = $items->length;
+        for ($i =  $nodeListLength - 1; $i >= 0; $i--) {
 
             $node = $items->item($i);
             $parent = $node->parentNode;
             $tablename = $node->getAttribute('tablename');
 
             $localtemplate = $node->getAttribute('template');
-            TualoApplication::timing("render_ds_".$localtemplate .' '.$tablename );
-            
-            if ($tablename){
+            TualoApplication::timing("render_ds_" . $localtemplate . ' ' . $tablename);
+
+            if ($tablename) {
                 $request = array(
                     'start' => 0,
                     'limit' => 1000000,
@@ -150,71 +166,68 @@ class PUGRenderingHelper{
                     'sort' => array()
                 );
                 $filterNodes = $node->getElementsByTagName('dsfilter');
-                if(count($filterNodes) > 0) {
-                    foreach ($filterNodes as $filterNode){
-                        if ($filterNode->getAttribute('property')=='__id'){
+                if (count($filterNodes) > 0) {
+                    foreach ($filterNodes as $filterNode) {
+                        if ($filterNode->getAttribute('property') == '__id') {
                             $request['filter'][] = array(
-                                'property'=> $filterNode->getAttribute('property'),
-                                'value'=>$filterNode->getAttribute('value'),
-                                'operator'=>$filterNode->getAttribute('operator')
+                                'property' => $filterNode->getAttribute('property'),
+                                'value' => $filterNode->getAttribute('value'),
+                                'operator' => $filterNode->getAttribute('operator')
                             );
-                        }else{
+                        } else {
                             $request['filter'][] = array(
-                                'property'=> $tablename.'__'.$filterNode->getAttribute('property'),
-                                'value'=>$filterNode->getAttribute('value'),
-                                'operator'=>$filterNode->getAttribute('operator')
+                                'property' => $tablename . '__' . $filterNode->getAttribute('property'),
+                                'value' => $filterNode->getAttribute('value'),
+                                'operator' => $filterNode->getAttribute('operator')
                             );
                         }
                     }
                 }
                 $filterNodes = $node->getElementsByTagName('dssort');
-                if(count($filterNodes) > 0) {
-                    foreach ($filterNodes as $filterNode){
+                if (count($filterNodes) > 0) {
+                    foreach ($filterNodes as $filterNode) {
                         $request['sort'][] = array(
-                            'property'=> $tablename.'__'.$filterNode->getAttribute('property'),
-                            'direction'=>$filterNode->getAttribute('direction')
+                            'property' => $tablename . '__' . $filterNode->getAttribute('property'),
+                            'direction' => $filterNode->getAttribute('direction')
                         );
                     }
                 }
 
-                $request['shortfieldnames']=1;
-                $request['sqlcache']=true;
-                
+                $request['shortfieldnames'] = 1;
+                $request['sqlcache'] = true;
+
                 $db = TualoApplication::get('session')->getDB();
 
 
-            self::$maxDeep--;
-            if (self::$maxDeep==0) throw new \Exception("max deep reached $localtemplate $tablename");
+                self::$maxDeep--;
+                if (self::$maxDeep == 0) throw new \Exception("max deep reached $localtemplate $tablename");
 
-            $read = DSReadRoute::read($db,$tablename,$request);
+                $read = DSReadRoute::read($db, $tablename, $request);
 
-            TualoApplication::timing("render_ds_".$localtemplate .' '.$tablename, [] );
+                TualoApplication::timing("render_ds_" . $localtemplate . ' ' . $tablename, []);
 
-                $read['definition'] = $db->direct('select column_name,label from ds_column_list_label where active=1 and hidden=0 and table_name={table_name} order by position',array('table_name'=>$tablename));
-                
+                $read['definition'] = $db->direct('select column_name,label from ds_column_list_label where active=1 and hidden=0 and table_name={table_name} order by position', array('table_name' => $tablename));
 
-                $subhtml = PUGRenderingHelper::_render($idList,$localtemplate,$read);
+
+                $subhtml = PUGRenderingHelper::_render($idList, $localtemplate, $read);
                 $subdoc = new \DOMDocument();
-                if (!empty(trim(chop($subhtml)))){
-                    $subdoc->loadHTML('<?xml encoding="utf-8" ?>'.$subhtml,LIBXML_NOWARNING);
+                if (!empty(trim(chop($subhtml)))) {
+                    $subdoc->loadHTML('<?xml encoding="utf-8" ?>' . $subhtml, LIBXML_NOWARNING);
                     $subitems = null;
                     $body = $subdoc->getElementsByTagName('body');
-                    if ($body->length!=0) {
+                    if ($body->length != 0) {
                         $subitems = $body[0]->childNodes;
                     }
-                    if ($subitems!==null){
-                        for ($it = $subitems->length; --$it >= 0; ) {
+                    if ($subitems !== null) {
+                        for ($it = $subitems->length; --$it >= 0;) {
                             $subnode = $subitems->item($it);
-                            if ($importedNode = $doc->importNode($subnode->cloneNode(true),true)) {
-                                $parent->insertBefore($importedNode,$node->nextSibling);
-    //                                    $parent->appendChild($importedNode);
+                            if ($importedNode = $doc->importNode($subnode->cloneNode(true), true)) {
+                                $parent->insertBefore($importedNode, $node->nextSibling);
+                                //                                    $parent->appendChild($importedNode);
                             }
                         }
-    
                     }
-                    
                 }
-
             }
             $parent->removeChild($node);
         }
@@ -222,54 +235,55 @@ class PUGRenderingHelper{
     }
 
 
-    public static function domReplaceBarcodeImage(&$doc,$idList,$template,$request){
+    public static function domReplaceBarcodeImage(&$doc, $idList, $template, $request)
+    {
         $db = TualoApplication::get('session')->getDB();
         $items = $doc->getElementsByTagName('barcodeimage');
-        $nodeListLength = $items->length; 
+        $nodeListLength = $items->length;
 
-        for ($i =  $nodeListLength-1; $i >= 0; $i--) {
+        for ($i =  $nodeListLength - 1; $i >= 0; $i--) {
             $node = $items->item($i);
             $parent = $node->parentNode;
             $id = NULL;
-            
-            $xattr="";
-            
+
+            $xattr = "";
+
             if ($node->hasAttributes()) {
-                if ($node->hasAttribute('type')){
+                if ($node->hasAttribute('type')) {
                     $type = $node->getAttribute('type');
-                    if ($node->hasAttribute('data')){
+                    if ($node->hasAttribute('data')) {
                         $data = $node->getAttribute('data');
                         $xattr = "";
                         foreach ($node->attributes as $attr) {
                             $name = $attr->nodeName;
-                            if (!in_array($name,array('data','type' ))){
+                            if (!in_array($name, array('data', 'type'))) {
                                 $value = $attr->nodeValue;
-                                $xattr.=' '.$name.'="'.$value.'"';
+                                $xattr .= ' ' . $name . '="' . $value . '"';
                             }
                         }
 
-                        if ($type=='qr'){
+                        if ($type == 'qr') {
 
                             // composer require chillerlan/php-qrcode
-                            if (class_exists("chillerlan\QRCode\QRCode")){
-                                $subhtml = '<img src="'.(new QRCode)->render($data).'" '.$xattr.' />';
-                            }else{
+                            if (class_exists("chillerlan\QRCode\QRCode")) {
+                                $subhtml = '<img src="' . (new QRCode)->render($data) . '" ' . $xattr . ' />';
+                            } else {
                                 $subhtml = '<span>QRCode lib not installed</span>';
                             }
-                            
+
                             $subdoc = new \DOMDocument();
-                            if (!empty(trim(chop($subhtml)))){
-                                $subdoc->loadHTML('<?xml encoding="utf-8" ?>'.$subhtml,LIBXML_NOWARNING);
+                            if (!empty(trim(chop($subhtml)))) {
+                                $subdoc->loadHTML('<?xml encoding="utf-8" ?>' . $subhtml, LIBXML_NOWARNING);
                                 $subitems = $subdoc->getElementsByTagName('body')[0]->childNodes;
-                                for ($it = $subitems->length; --$it >= 0; ) {
+                                for ($it = $subitems->length; --$it >= 0;) {
                                     $subnode = $subitems->item($it);
-                                    if ($importedNode = $doc->importNode($subnode->cloneNode(true),true)) {
-                                        $parent->insertBefore($importedNode,$node->nextSibling);
-    //                                    $parent->appendChild($importedNode);
+                                    if ($importedNode = $doc->importNode($subnode->cloneNode(true), true)) {
+                                        $parent->insertBefore($importedNode, $node->nextSibling);
+                                        //                                    $parent->appendChild($importedNode);
                                     }
                                 }
                             }
-                        }else if(in_array($type,array(
+                        } else if (in_array($type, array(
                             'c39',
                             'c39-c',
                             'c39-e',
@@ -300,8 +314,8 @@ class PUGRenderingHelper{
                             'c11',
                             'pharma',
                             'pharma-2'
-                        ))){
-                            if (class_exists("Picqer\Barcode\BarcodeGeneratorPNG")){
+                        ))) {
+                            if (class_exists("Picqer\Barcode\BarcodeGeneratorPNG")) {
 
                                 $generator = new \Picqer\Barcode\BarcodeGeneratorPNG();
                                 $types = array();
@@ -335,124 +349,123 @@ class PUGRenderingHelper{
                                 $types['c11'] = $generator::TYPE_CODE_11;
                                 $types['pharma'] = $generator::TYPE_PHARMA_CODE;
                                 $types['pharma-2'] = $generator::TYPE_PHARMA_CODE_TWO_TRACKS;
-                                $subhtml = '<img src="data:image/png;base64,' . base64_encode($generator->getBarcode($data, $types[$type])) . '" '.$xattr.'/>';
+                                $subhtml = '<img src="data:image/png;base64,' . base64_encode($generator->getBarcode($data, $types[$type])) . '" ' . $xattr . '/>';
                                 // composer require picqer/php-barcode-generator
-                            }else{
+                            } else {
                                 $subhtml = '<span>BarcodeGenerator lib not installed</span>';
                             }
                             $subdoc = new \DOMDocument();
-                            if (!empty(trim(chop($subhtml)))){
-                                $subdoc->loadHTML('<?xml encoding="utf-8" ?>'.$subhtml,LIBXML_NOWARNING);
+                            if (!empty(trim(chop($subhtml)))) {
+                                $subdoc->loadHTML('<?xml encoding="utf-8" ?>' . $subhtml, LIBXML_NOWARNING);
                                 $subitems = $subdoc->getElementsByTagName('body')[0]->childNodes;
-                                foreach($subitems as $subnode) {
-                                    if ($importedNode = $doc->importNode($subnode->cloneNode(true),true)) {
-    //                                            $parent->insertBefore($importedNode,$node->nextSibling);
+                                foreach ($subitems as $subnode) {
+                                    if ($importedNode = $doc->importNode($subnode->cloneNode(true), true)) {
+                                        //                                            $parent->insertBefore($importedNode,$node->nextSibling);
                                         $parent->appendChild($importedNode);
-
                                     }
                                 }
                             }
                         }
-
                     }
                 }
-
-                
             }
         }
     }
 
-    public static function domReplaceDSSignumImage(&$doc,$idList,$template,$request){
+    public static function domReplaceDSSignumImage(&$doc, $idList, $template, $request)
+    {
         $db = TualoApplication::get('session')->getDB();
 
         $items = $doc->getElementsByTagName('signumimage');
-        $nodeListLength = $items->length; 
-        for ($i =  $nodeListLength-1; $i >= 0; $i--) {
+        $nodeListLength = $items->length;
+        for ($i =  $nodeListLength - 1; $i >= 0; $i--) {
             $node = $items->item($i);
             $parent = $node->parentNode;
             $tableextension = NULL;
             $reportnumber = NULL;
             $thickness = 1;
             $xattr = '';
-            
+
             if ($node->hasAttributes()) {
                 if ($node->hasAttribute('tableextension'))
-                $tableextension= $node->getAttribute('tableextension');
+                    $tableextension = $node->getAttribute('tableextension');
                 if ($node->hasAttribute('reportnumber'))
-                $reportnumber = $node->getAttribute('reportnumber');
+                    $reportnumber = $node->getAttribute('reportnumber');
                 if ($node->hasAttribute('thickness'))
-                $thickness = $node->getAttribute('thickness');
+                    $thickness = $node->getAttribute('thickness');
                 foreach ($node->attributes as $attr) {
                     $name = $attr->nodeName;
-                    if (!in_array($name,array('tableextension','reportnumber','thickness'))){
+                    if (!in_array($name, array('tableextension', 'reportnumber', 'thickness'))) {
                         $value = $attr->nodeValue;
-                        $xattr.=' '.$name.'="'.$value.'"';
+                        $xattr .= ' ' . $name . '="' . $value . '"';
                     }
                 }
             }
 
             if ($reportnumber)
-            if ($tableextension){
-                $list = $db->direct('select x,y from blg_signum_'.$tableextension.' where id={id} order by pos',array('id'=>$reportnumber));
-                if(($list)&&(count($list)>0)){
-                    $width=0;$height=0;
-                    foreach($list as $item) { $width=max($width,$item['x']);$height=max($height,$item['y']); }
-
-                    if ( ($width>0) && ($height>0) ){
-                        $im_dest = imagecreatetruecolor ($width, $height);
-                        imagealphablending($im_dest, false);
-
-                        $white = imagecolorallocate($im_dest, 255, 255, 255);
-                        $black = imagecolorallocate($im_dest, 0, 0, 0);
-                        imagefilledrectangle($im_dest,0,0,$width,$height,$white);
-
-                        imagesetthickness($im_dest,$thickness);
-
-                        $start_line = true;
-                        //$max_scale=0.3;
-                        $last_point = array('x'=>-1,'y'=>-1);
-                        foreach($list as $pos){
-                            if ($pos['x']!=-1){
-                                if ($last_point['x']!=-1){
-                                    imageline($im_dest,$last_point['x'],$last_point['y'],$pos['x'],$pos['y'],$black);
-                                }
-                            }
-                            $last_point=$pos;
+                if ($tableextension) {
+                    $list = $db->direct('select x,y from blg_signum_' . $tableextension . ' where id={id} order by pos', array('id' => $reportnumber));
+                    if (($list) && (count($list) > 0)) {
+                        $width = 0;
+                        $height = 0;
+                        foreach ($list as $item) {
+                            $width = max($width, $item['x']);
+                            $height = max($height, $item['y']);
                         }
 
-                        $destfile = TualoApplication::get('tempPath').'/'.uniqid();
+                        if (($width > 0) && ($height > 0)) {
+                            $im_dest = imagecreatetruecolor($width, $height);
+                            imagealphablending($im_dest, false);
 
-                        imagepng($im_dest, $destfile);
-                        imagedestroy($im_dest);
-                        $subhtml = '<img src="data:image/png;base64,'.base64_encode( file_get_contents($destfile) ).'" '.$xattr.' />';
-                        $subdoc = new \DOMDocument();
-                        if (!empty(trim(chop($subhtml)))){
-                            $subdoc->loadHTML('<?xml encoding="utf-8" ?>'.$subhtml,LIBXML_NOWARNING);
-                            $subitems = $subdoc->getElementsByTagName('body')[0]->childNodes;
-                            for ($it = $subitems->length; --$it >= 0; ) {
-                                $subnode = $subitems->item($it);
-                                if ($importedNode = $doc->importNode($subnode->cloneNode(true),true)) {
-                                    $parent->insertBefore($importedNode,$node->nextSibling);
+                            $white = imagecolorallocate($im_dest, 255, 255, 255);
+                            $black = imagecolorallocate($im_dest, 0, 0, 0);
+                            imagefilledrectangle($im_dest, 0, 0, $width, $height, $white);
+
+                            imagesetthickness($im_dest, $thickness);
+
+                            $start_line = true;
+                            //$max_scale=0.3;
+                            $last_point = array('x' => -1, 'y' => -1);
+                            foreach ($list as $pos) {
+                                if ($pos['x'] != -1) {
+                                    if ($last_point['x'] != -1) {
+                                        imageline($im_dest, $last_point['x'], $last_point['y'], $pos['x'], $pos['y'], $black);
+                                    }
                                 }
+                                $last_point = $pos;
                             }
 
+                            $destfile = TualoApplication::get('tempPath') . '/' . uniqid();
 
+                            imagepng($im_dest, $destfile);
+                            imagedestroy($im_dest);
+                            $subhtml = '<img src="data:image/png;base64,' . base64_encode(file_get_contents($destfile)) . '" ' . $xattr . ' />';
+                            $subdoc = new \DOMDocument();
+                            if (!empty(trim(chop($subhtml)))) {
+                                $subdoc->loadHTML('<?xml encoding="utf-8" ?>' . $subhtml, LIBXML_NOWARNING);
+                                $subitems = $subdoc->getElementsByTagName('body')[0]->childNodes;
+                                for ($it = $subitems->length; --$it >= 0;) {
+                                    $subnode = $subitems->item($it);
+                                    if ($importedNode = $doc->importNode($subnode->cloneNode(true), true)) {
+                                        $parent->insertBefore($importedNode, $node->nextSibling);
+                                    }
+                                }
+                            }
+                            unlink($destfile);
                         }
-                        unlink($destfile);
                     }
                 }
-            }
             $parent->removeChild($node);
-
         }
     }
 
-    public static function domReplaceDSImage(&$doc,$idList,$template,$request){
+    public static function domReplaceDSImage(&$doc, $idList, $template, $request)
+    {
         $db = TualoApplication::get('session')->getDB();
 
         $items = $doc->getElementsByTagName('dsimage');
-        $nodeListLength = $items->length; 
-        for ($i =  $nodeListLength-1; $i >= 0; $i--) {
+        $nodeListLength = $items->length;
+        for ($i =  $nodeListLength - 1; $i >= 0; $i--) {
             $node = $items->item($i);
             $parent = $node->parentNode;
             $id = NULL;
@@ -460,190 +473,194 @@ class PUGRenderingHelper{
             $queryfield = NULL;
             $queryvalue = NULL;
             $filecolumn = NULL;
-            $xattr="";
-            
+            $xattr = "";
+
             // dsimage(tablename="dateien",queryfield="name",queryvalue="",filecolumn="datei")
             if ($node->hasAttributes()) {
                 if ($node->hasAttribute('tablename'))
-                $tablename = $node->getAttribute('tablename');
+                    $tablename = $node->getAttribute('tablename');
                 if ($node->hasAttribute('queryfield'))
-                $queryfield = $node->getAttribute('queryfield');
+                    $queryfield = $node->getAttribute('queryfield');
                 if ($node->hasAttribute('queryvalue'))
-                $queryvalue = $node->getAttribute('queryvalue');
+                    $queryvalue = $node->getAttribute('queryvalue');
                 if ($node->hasAttribute('filecolumn'))
-                $filecolumn = $node->getAttribute('filecolumn');
-            
+                    $filecolumn = $node->getAttribute('filecolumn');
+
                 foreach ($node->attributes as $attr) {
                     $name = $attr->nodeName;
-                    if (!in_array($name,array('tablename','queryfield','queryvalue','filecolumn'))){
+                    if (!in_array($name, array('tablename', 'queryfield', 'queryvalue', 'filecolumn'))) {
                         $value = $attr->nodeValue;
-                        $xattr.=' '.$name.'="'.$value.'"';
+                        $xattr .= ' ' . $name . '="' . $value . '"';
                     }
                 }
             }
 
             if ($filecolumn)
-            if ($queryfield)
-            if ($queryvalue)
-            if ($tablename){
-                $res = DSReadRoute::read($db,$tablename,array(
-                    'sqlcache'=>true,
-                    'filter'=>array(
-                        array('operator'=>'=','property'=>$tablename.'__'.$queryfield ,'value'=>$queryvalue)
-                    )
-                ));
-                if(isset($res['data']) && isset($res['data'][0]) && isset($res['data'][0][$tablename.'__'.$filecolumn])) $id = $res['data'][0][$tablename.'__'.$filecolumn];
-                if(false)
-                if ($id){
-                    $mime = DSFileHelper::getFileMimeType($db,$tablename,$id);
-                    if (isset($mime['mime'])){
-                        $image = DSFileHelper::getFile($db,$tablename,$id,$direct=true,$base64=true);
-                        if (isset($image['success']) &&  ($image['success']==true) ){
-                            $subhtml = '<img src="data:'.$mime['mime'].';base64,'.$image['data'].'" '.$xattr.' />';
-                            /*if($mime['mime']=='image/svg+xml'){
+                if ($queryfield)
+                    if ($queryvalue)
+                        if ($tablename) {
+                            $res = DSReadRoute::read($db, $tablename, array(
+                                'sqlcache' => true,
+                                'filter' => array(
+                                    array('operator' => '=', 'property' => $tablename . '__' . $queryfield, 'value' => $queryvalue)
+                                )
+                            ));
+                            if (isset($res['data']) && isset($res['data'][0]) && isset($res['data'][0][$tablename . '__' . $filecolumn])) $id = $res['data'][0][$tablename . '__' . $filecolumn];
+                            if (false)
+                                if ($id) {
+                                    $mime = DSFileHelper::getFileMimeType($db, $tablename, $id);
+                                    if (isset($mime['mime'])) {
+                                        $image = DSFileHelper::getFile($db, $tablename, $id, $direct = true, $base64 = true);
+                                        if (isset($image['success']) &&  ($image['success'] == true)) {
+                                            $subhtml = '<img src="data:' . $mime['mime'] . ';base64,' . $image['data'] . '" ' . $xattr . ' />';
+                                            /*if($mime['mime']=='image/svg+xml'){
                                 $subhtml = str_replace('<svg ','<svg '.$xattr.'',base64_decode($image['data']));
                             }*/
-                            $subdoc = new \DOMDocument();
-                            if (!empty(trim(chop($subhtml)))){
-                                $subdoc->loadHTML('<?xml encoding="utf-8" ?>'.$subhtml,LIBXML_NOWARNING);
-                                $subitems = $subdoc->getElementsByTagName('body')[0]->childNodes;
-                                for ($it = $subitems->length; --$it >= 0; ) {
-                                    $subnode = $subitems->item($it);
-                                    if ($importedNode = $doc->importNode($subnode->cloneNode(true),true)) {
-                                        $parent->insertBefore($importedNode,$node->nextSibling);
-    //                                    $parent->appendChild($importedNode);
+                                            $subdoc = new \DOMDocument();
+                                            if (!empty(trim(chop($subhtml)))) {
+                                                $subdoc->loadHTML('<?xml encoding="utf-8" ?>' . $subhtml, LIBXML_NOWARNING);
+                                                $subitems = $subdoc->getElementsByTagName('body')[0]->childNodes;
+                                                for ($it = $subitems->length; --$it >= 0;) {
+                                                    $subnode = $subitems->item($it);
+                                                    if ($importedNode = $doc->importNode($subnode->cloneNode(true), true)) {
+                                                        $parent->insertBefore($importedNode, $node->nextSibling);
+                                                        //                                    $parent->appendChild($importedNode);
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
+                                }
+                        }
+            $parent->removeChild($node);
+        }
+        return $doc;
+    }
+
+
+    public static function domReplaceReportImage(&$doc, $idList, $template, $request)
+    {
+        $db = TualoApplication::get('session')->getDB();
+
+        $items = $doc->getElementsByTagName('reportimage');
+        $nodeListLength = $items->length;
+        for ($i =  $nodeListLength - 1; $i >= 0; $i--) {
+            $node = $items->item($i);
+            $parent = $node->parentNode;
+            $id = NULL;
+
+
+            $id = NULL;
+            $page = NULL;
+            $filecolumn = NULL;
+            $xattr = "";
+
+            // dsimage(tablename="dateien",queryfield="name",queryvalue="",filecolumn="datei")
+            if ($node->hasAttributes()) {
+                if ($node->hasAttribute('id'))
+                    $id = $node->getAttribute('id');
+                if ($node->hasAttribute('page'))
+                    $page = $node->getAttribute('page');
+
+                foreach ($node->attributes as $attr) {
+                    $name = $attr->nodeName;
+                    if (!in_array($name, array('id', 'page'))) {
+                        $value = $attr->nodeValue;
+                        $xattr .= ' ' . $name . '="' . $value . '"';
+                    }
+                }
+            }
+
+            if ($id !== NULL)
+                if ($page !== NULL) {
+                    $res = DSReadRoute::read($db, 'report_images', array(
+                        'sqlcache' => true,
+                        'filter' => array(
+                            array('operator' => '=', 'property' => 'report_images__id', 'value' => $id),
+                            array('operator' => '=', 'property' => 'report_images__page', 'value' => $page)
+                        )
+                    ));
+
+                    if (isset($res['data']) && isset($res['data'][0]) && isset($res['data'][0]['report_images__id'])) {
+                        $subhtml = '<img src="data:' . $res['data'][0]['report_images__mimetype'] . ';base64,' . $res['data'][0]['report_images__filedata'] . '" ' . $xattr . ' />';
+
+                        $subdoc = new \DOMDocument();
+                        if (!empty(trim(chop($subhtml)))) {
+                            $subdoc->loadHTML('<?xml encoding="utf-8" ?>' . $subhtml, LIBXML_NOWARNING);
+                            $subitems = $subdoc->getElementsByTagName('body')[0]->childNodes;
+                            for ($it = $subitems->length; --$it >= 0;) {
+                                $subnode = $subitems->item($it);
+                                if ($importedNode = $doc->importNode($subnode->cloneNode(true), true)) {
+                                    $parent->insertBefore($importedNode, $node->nextSibling);
+                                    //                                    $parent->appendChild($importedNode);
                                 }
                             }
                         }
                     }
                 }
-            }
             $parent->removeChild($node);
         }
         return $doc;
     }
 
 
-    public static function domReplaceReportImage(&$doc,$idList,$template,$request){
-        $db = TualoApplication::get('session')->getDB();
-
-        $items = $doc->getElementsByTagName('reportimage');
-        $nodeListLength = $items->length; 
-        for ($i =  $nodeListLength-1; $i >= 0; $i--) {
-            $node = $items->item($i);
-            $parent = $node->parentNode;
-            $id = NULL;
-            
-            
-            $id = NULL;
-            $page = NULL;
-            $filecolumn = NULL;
-            $xattr="";
-            
-            // dsimage(tablename="dateien",queryfield="name",queryvalue="",filecolumn="datei")
-            if ($node->hasAttributes()) {
-                if ($node->hasAttribute('id'))
-                $id = $node->getAttribute('id');
-                if ($node->hasAttribute('page'))
-                $page = $node->getAttribute('page');
-            
-                foreach ($node->attributes as $attr) {
-                    $name = $attr->nodeName;
-                    if (!in_array($name,array('id','page'))){
-                        $value = $attr->nodeValue;
-                        $xattr.=' '.$name.'="'.$value.'"';
-                    }
-                }
-            }
-
-            if ($id!==NULL)
-            if ($page!==NULL){
-                $res = DSReadRoute::read($db,'report_images',array(
-                    'sqlcache'=>true,
-                    'filter'=>array(
-                        array('operator'=>'=','property'=>'report_images__id' ,'value'=>$id),
-                        array('operator'=>'=','property'=>'report_images__page' ,'value'=>$page)
-                    )
-                ));
-
-                if(isset($res['data']) && isset($res['data'][0]) && isset($res['data'][0]['report_images__id'])){
-                    $subhtml = '<img src="data:'.$res['data'][0]['report_images__mimetype'].';base64,'.$res['data'][0]['report_images__filedata'].'" '.$xattr.' />';
-                    
-                    $subdoc = new \DOMDocument();
-                    if (!empty(trim(chop($subhtml)))){
-                        $subdoc->loadHTML('<?xml encoding="utf-8" ?>'.$subhtml,LIBXML_NOWARNING);
-                        $subitems = $subdoc->getElementsByTagName('body')[0]->childNodes;
-                        for ($it = $subitems->length; --$it >= 0; ) {
-                            $subnode = $subitems->item($it);
-                            if ($importedNode = $doc->importNode($subnode->cloneNode(true),true)) {
-                                $parent->insertBefore($importedNode,$node->nextSibling);
-    //                                    $parent->appendChild($importedNode);
-                            }
-                        }
-                    }
-                }
-            }
-            $parent->removeChild($node);
-        }
-        return $doc;
-    }
-
-
-    public static function dataMerge($data){
-        if (isset($_SESSION['pug_session'])) $data=array_merge(array('session'=>$_SESSION['pug_session']),$data);
-        if (isset($GLOBALS['pug_merge'])){
-            foreach( $GLOBALS['pug_merge'] as $k=>$v) $data=array_merge(array($k=>$v),$data);
+    public static function dataMerge($data)
+    {
+        if (isset($_SESSION['pug_session'])) $data = array_merge(array('session' => $_SESSION['pug_session']), $data);
+        if (isset($GLOBALS['pug_merge'])) {
+            foreach ($GLOBALS['pug_merge'] as $k => $v) $data = array_merge(array($k => $v), $data);
         }
         return $data;
     }
 
-    public static function _render($idList,$template,$request){
+    public static function _render($idList, $template, $request)
+    {
         $data = $request;
-        
-        
+
+
         $data['idList'] = $idList;
         $data['template'] = $template;
-        $data=self::dataMerge($data);
-        
-        
+        $data = self::dataMerge($data);
+
+
         $db = TualoApplication::get('session')->getDB();
-        $data['ds']= new DS($db);
+        $data['ds'] = new DS($db);
 
-        
+
         $pug = self::getPug();
-        $html = $pug->renderFile( self::getPUGPath().'/'.$template.'.pug',$data);
+        $html = $pug->renderFile(self::getPUGPath() . '/' . $template . '.pug', $data);
 
-        
-        if (empty(trim(chop($html)))){
+
+        if (empty(trim(chop($html)))) {
             return $html;
         }
 
-        
+
         $doc = new \DOMDocument();
         libxml_use_internal_errors(TRUE);
-        $doc->loadHTML('<?xml encoding="utf-8" ?>'.''.$html.'',LIBXML_NOWARNING);
-        PUGRenderingHelper::domReplaceBarcodeImage($doc,$idList,$template,$request);
-        PUGRenderingHelper::domReplaceDS($doc,$idList,$template,$request);
-        
-        PUGRenderingHelper::domReplaceDSImage($doc,$idList,$template,$request);
+        $doc->loadHTML('<?xml encoding="utf-8" ?>' . '' . $html . '', LIBXML_NOWARNING);
+        PUGRenderingHelper::domReplaceBarcodeImage($doc, $idList, $template, $request);
+        PUGRenderingHelper::domReplaceDS($doc, $idList, $template, $request);
 
-        PUGRenderingHelper::domReplaceReportImage($doc,$idList,$template,$request);
-        PUGRenderingHelper::domReplaceDSSignumImage($doc,$idList,$template,$request);
-        
-        return str_replace('<?xml encoding="utf-8" ?>','',$doc->saveHTML());
+        PUGRenderingHelper::domReplaceDSImage($doc, $idList, $template, $request);
+
+        PUGRenderingHelper::domReplaceReportImage($doc, $idList, $template, $request);
+        PUGRenderingHelper::domReplaceDSSignumImage($doc, $idList, $template, $request);
+
+        return str_replace('<?xml encoding="utf-8" ?>', '', $doc->saveHTML());
     }
 
-    public static function render($idList,$template,$request){
+    public static function render($idList, $template, $request)
+    {
 
 
-        TualoApplication::timing("render0",'');
+        TualoApplication::timing("render0", '');
         TualoApplication::appendTiming(true);
-        TualoApplication::timing("render1",'');
+        TualoApplication::timing("render1", '');
 
         $data = $request;
         $data['idList'] = '';
-        if(!is_null($idList)&&isset($idList[0])) $data['idList'] = urldecode($idList[0]);
+        if (!is_null($idList) && isset($idList[0])) $data['idList'] = urldecode($idList[0]);
         $data['template'] = $template;
 
         set_time_limit(10);
@@ -651,13 +668,13 @@ class PUGRenderingHelper{
         $db = TualoApplication::get('session')->getDB();
         $tablename = $request['tablename'];
 
-        TualoApplication::timing("render2",'');
+        TualoApplication::timing("render2", '');
 
-        $cssread = DSReadRoute::read($db,'ds_renderer_stylesheet_groups_assign',array(
-            'start' => 0, 
+        $cssread = DSReadRoute::read($db, 'ds_renderer_stylesheet_groups_assign', array(
+            'start' => 0,
             'limit' => 1000000,
-            'shortfieldnames'=>1, 
-            'sqlcache'=>true,
+            'shortfieldnames' => 1,
+            'sqlcache' => true,
             'sort' => array(),
             'filter' => array(
                 array(
@@ -672,39 +689,40 @@ class PUGRenderingHelper{
                 )
             )
         ));
-        
-        
-        if ($cssread){
+
+
+        if ($cssread) {
             $data['stylesheets'] = $cssread['data'];
         }
         TualoApplication::timing("render css", '');
 
 
-        $request = [ 'start' => 0, 'limit' => 1000000, 'filter' => array(), 'sort' => [] ];
-        $request['filter'][] = [ 'property'=> '__id', 'value'=> $idList, 'operator'=> 'in' ];
-        $request['shortfieldnames']=1;
-        $request['sqlcache']=true;
-        
-        $read = DSReadRoute::read($db,$tablename,$request);
-        
-        $read['definition'] = $db->direct('select column_name,label from ds_column_list_label where active=1 and hidden=0 and table_name={table_name} order by position',array('table_name'=>$tablename));
-        $data=array_merge($read,$data);
+        $request = ['start' => 0, 'limit' => 1000000, 'filter' => array(), 'sort' => []];
+        $request['filter'][] = ['property' => '__id', 'value' => $idList, 'operator' => 'in'];
+        $request['shortfieldnames'] = 1;
+        $request['sqlcache'] = true;
 
-        $data=self::dataMerge($data);
-        
+        $read = DSReadRoute::read($db, $tablename, $request);
+
+        $read['definition'] = $db->direct('select column_name,label from ds_column_list_label where active=1 and hidden=0 and table_name={table_name} order by position', array('table_name' => $tablename));
+        $data = array_merge($read, $data);
+
+        $data = self::dataMerge($data);
+
         $db = TualoApplication::get('session')->getDB();
-        $data['ds']= new DS($db);
-        $data['request']= new Request();
-        $data['datetime']=self::datetime();
+        $data['ds'] = new DS($db);
+        $data['request'] = new Request();
+        $data['datetime'] = self::datetime();
+        $data['dstable'] = self::dstable();
 
-        
 
-        TualoApplication::timing("render before",'');
+
+        TualoApplication::timing("render before", '');
 
 
         //self::cachePUGFiles();
         $pug = self::getPug();
-        TualoApplication::timing("render self pug",'');
+        TualoApplication::timing("render self pug", '');
 
 
         $missingRequirements = array_keys(array_filter($pug->requirements(), function ($valid) {
@@ -714,7 +732,7 @@ class PUGRenderingHelper{
         if ($missings) {
             echo $missings . ' requirements are missing.<br />';
             foreach ($missingRequirements as $requirement) {
-                switch($requirement) {
+                switch ($requirement) {
                     case 'streamWhiteListed':
                         echo 'Suhosin is enabled and ' . $pug->getOption('stream') . ' is not in suhosin.executor.include.whitelist, please add it to your php.ini file.<br />';
                         break;
@@ -731,29 +749,29 @@ class PUGRenderingHelper{
             exit(1);
         }
 
-        try{
+        try {
             $data['ds'] = DSTable::init($db);
-            $html = $pug->renderFile( self::getPUGPath().'/'.$template.'.pug',$data);
-            TualoApplication::timing("render after",'');
-            if (empty(trim(chop($html)))){
+            $html = $pug->renderFile(self::getPUGPath() . '/' . $template . '.pug', $data);
+            TualoApplication::timing("render after", '');
+            if (empty(trim(chop($html)))) {
                 return $html;
             }
-        }catch(\Exception $e){
-            $html=$e->getMessage();
+        } catch (\Exception $e) {
+            $html = $e->getMessage();
             TualoApplication::logger('error')->error($e->getMessage());
         }
 
-        
+
 
         $doc = new \DOMDocument();
         libxml_use_internal_errors(TRUE);
-        $doc->loadHTML('<?xml encoding="utf-8" ?>'.''.$html.'',LIBXML_NOWARNING);
-        PUGRenderingHelper::domReplaceBarcodeImage($doc,$idList,$template,$request);
-        PUGRenderingHelper::domReplaceDS($doc,$idList,$template,$request);
-        PUGRenderingHelper::domReplaceDSImage($doc,$idList,$template,$request);
-        PUGRenderingHelper::domReplaceDSSignumImage($doc,$idList,$template,$request);
-        TualoApplication::timing("render5",'');
+        $doc->loadHTML('<?xml encoding="utf-8" ?>' . '' . $html . '', LIBXML_NOWARNING);
+        PUGRenderingHelper::domReplaceBarcodeImage($doc, $idList, $template, $request);
+        PUGRenderingHelper::domReplaceDS($doc, $idList, $template, $request);
+        PUGRenderingHelper::domReplaceDSImage($doc, $idList, $template, $request);
+        PUGRenderingHelper::domReplaceDSSignumImage($doc, $idList, $template, $request);
+        TualoApplication::timing("render5", '');
 
-        return str_replace('<?xml encoding="utf-8" ?>','',$doc->saveHTML());
+        return str_replace('<?xml encoding="utf-8" ?>', '', $doc->saveHTML());
     }
 }
