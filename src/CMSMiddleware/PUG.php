@@ -12,7 +12,7 @@ class PUG
 
     public static function pug(): callable
     {
-        return function ($options): PUG2 {
+        return function (array $options = []): PUG2 {
             return new PUG2(
                 App::get('session')->getDB(),
                 $options
