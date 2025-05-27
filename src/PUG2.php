@@ -106,6 +106,7 @@ class PUG2
             'stylesheets' => $stylesheets,
             'datetime' => self::datetime(),
             'base64file' => self::base64file(),
+            'dsfiles' => self::dsfiles(),
             'request' => new Request(),
             'relocate' => new Relocate(),
             'keysort' => self::keysort(),
@@ -114,6 +115,12 @@ class PUG2
         ]);
     }
 
+    public static function dsfiles(): callable
+    {
+        return function (string $tablename): \Tualo\Office\DS\DSFiles {
+            return \Tualo\Office\DS\DSFiles::instance($tablename);
+        };
+    }
 
     public static function base64file(): callable
     {

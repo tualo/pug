@@ -66,6 +66,12 @@ class PUG
         };
     }
 
+    public static function dsfiles(): callable
+    {
+        return function (string $tablename): \Tualo\Office\DS\DSFiles {
+            return \Tualo\Office\DS\DSFiles::instance($tablename);
+        };
+    }
 
     public static function base64file(): callable
     {
@@ -113,6 +119,7 @@ class PUG
             'datetime' => self::datetime(),
             'base64file' => self::base64file(),
             'dstable' => self::dstable(),
+            'dsfiles' => self::dsfiles(),
             'keysort' => self::keysort(),
             'baseURL' => $url,
             'pug' => self::pugFN(),
