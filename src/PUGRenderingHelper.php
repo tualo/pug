@@ -711,11 +711,16 @@ class PUGRenderingHelper
 
         $db = TualoApplication::get('session')->getDB();
         $data['ds'] = new DS($db);
-        $data['request'] = new Request();
-        $data['datetime'] = self::datetime();
-        $data['dstable'] = self::dstable();
-
-
+        $fn = [
+            'dstable' => self::dstable(),
+            'request' => new Request(),
+            'relocate' => new Relocate(),
+            'datetime' => self::datetime(),
+            'base64file' => PUG2::base64file(),
+            'dsfiles' => PUG2::dsfiles(),
+            'keysort' => PUG2::keysort(),
+        ];
+        $data = array_merge($data, $fn);
 
         TualoApplication::timing("render before", '');
 
