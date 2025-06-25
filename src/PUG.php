@@ -36,25 +36,7 @@ class PUG
 
     public static function getPug($options = []): P
     {
-        $o = [
-            'pretty' => true,
-            'debug' => TualoApplication::configuration('pug', 'debug', '0') == 1,
-            'cache' => dirname(self::getPUGPath()) . '/cache',
-            'basedir' => self::getPUGPath(),
-            //'execution_max_time'=>3000000,
-            'execution_max_time' => 30000,
-            'upToDateCheck' => true,
-            'enable_profiler' => false,
-            'profiler' => [
-                'timeprecision' => 3,
-                'lineheight'    => 30,
-                'display'        => true,
-                'log'            => false,
-            ]
-        ];
-        if (isset($GLOBALS['pug_formats'])) {
-            $o['formats'] = $GLOBALS['pug_formats'];
-        }
+        $o = PUGOptions::getOptions();
         $o = array_merge($o, $options);
         return new P($o);
     }

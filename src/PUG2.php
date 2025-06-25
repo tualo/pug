@@ -51,21 +51,7 @@ class PUG2
     private function getPug($options = []): P
     {
         $path = $this->getPUGPath();
-        $o = [
-            'pretty' => true,
-            'debug' => TualoApplication::configuration('pug', 'debug', '0') == 1,
-            'cache' => dirname($path) . '/cache',
-            'basedir' => $path,
-            'execution_max_time' => 30000,
-            'upToDateCheck' => true,
-            'enable_profiler' => false,
-            'profiler' => [
-                'timeprecision' => 3,
-                'lineheight'    => 30,
-                'display'        => true,
-                'log'            => false,
-            ]
-        ];
+        $o = PUGOptions::getOptions();
         $o = array_merge($o, $this->options);
         $o = array_merge($o, $options);
 
