@@ -29,8 +29,15 @@ class PUGOptions
                 CIDR::getIP($keys),
                 explode(' ', TualoApplication::configuration('pug', 'debug_cidrs'))
             )) {
-                TualoApplication::logger('PUG')->info("PUG Debug Mode enabled for " . CIDR::getIP($keys));
-                $section = 'pug_debug';
+                if (TualoApplication::configuration('pug_debug', 'cache', dirname(self::getPUGPath()) . '/cache') == TualoApplication::configuration('pug', 'cache', dirname(self::getPUGPath()) . '/cache')) {
+                    TualoApplication::logger('PUG')->warning("PUG Debug Cache must be set to a different path than the normal pug cache path", [
+                        'pug_debug_cache' => TualoApplication::configuration('pug_debug', 'cache', dirname(self::getPUGPath()) . '/cache'),
+                        'pug_cache' => TualoApplication::configuration('pug', 'cache', dirname(self::getPUGPath()) . '/cache')
+                    ]);
+                } else {
+                    TualoApplication::logger('PUG')->info("PUG Debug Mode enabled for " . CIDR::getIP($keys));
+                    $section = 'pug_debug';
+                }
             } else {
                 TualoApplication::logger('PUG')->info("PUG Debug Mode disabled for " . CIDR::getIP($keys));
             }
