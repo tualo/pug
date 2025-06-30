@@ -93,6 +93,7 @@ class PUG
                 $data
             );
         }
+        TualoApplication::set('inside_pug', true);
         $http = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on' ? "https://" : "http://";
         $url = $http . $_SERVER["SERVER_NAME"] . dirname($_SERVER['SCRIPT_NAME']) . '/';
         $o = [

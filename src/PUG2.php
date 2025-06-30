@@ -85,7 +85,7 @@ class PUG2
 
         if (is_null($stylesheets))
             $stylesheets = [];
-
+        TualoApplication::set('inside_pug', true);
 
         return $pug->renderFile($template, [
             'data' => $data,

@@ -702,7 +702,7 @@ class PUGRenderingHelper
             'keysort' => PUG2::keysort(),
         ];
         $data = array_merge($data, $fn);
-
+        TualoApplication::set('inside_pug', true);
         TualoApplication::timing("render before", '');
 
 
