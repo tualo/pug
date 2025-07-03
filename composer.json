@@ -1,27 +1,29 @@
 {
-    "name": "tualo/pug",
-    "description": "Sample Module for tualo office",
-    "type": "library",
-    "license": "MIT",
-
-    "authors": [
-        {
-            "name": "Thomas Hoffmann",
-            "email": "thomas.hoffmann@tualo.de"
-        }
-    ],
-    "autoload": {
-        "psr-4": {
-            "Tualo\\Office\\PUG\\": "src/"
-        },
-        "files": ["src/functions.php"]
-    },
-    "minimum-stability": "dev",
-    "require": {
-        "tualo/ds": "*",
-        "dompdf/dompdf": "*",
-        "pug-php/pug": "*",
-        "chillerlan/php-qrcode": "*",
-        "picqer/php-barcode-generator": "*"
+  "name": "tualo/pug",
+  "description": "Sample Module for tualo office",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Thomas Hoffmann",
+      "email": "thomas.hoffmann@tualo.de"
     }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Tualo\\Office\\PUG\\": "src/"
+    },
+    "files": [
+      "src/functions.php"
+    ]
+  },
+  "minimum-stability": "dev",
+  "require": {
+    "tualo/ds": "^1.0.1",
+    "dompdf/dompdf": "*",
+    "pug-php/pug": "*",
+    "chillerlan/php-qrcode": "*",
+    "picqer/php-barcode-generator": "*"
+  },
+  "version": "1.0.1"
 }
