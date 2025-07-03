@@ -19,11 +19,11 @@
   },
   "minimum-stability": "dev",
   "require": {
-    "tualo/ds": "^1.0.1",
+    "tualo/ds": "^1.0",
     "dompdf/dompdf": "~3.1.0",
     "pug-php/pug": "~3.5.0",
     "chillerlan/php-qrcode": "~5.0.3",
     "picqer/php-barcode-generator": "~3.2.2"
   },
-  "version": "1.0.2"
+  "version": "1.0.3"
 }
