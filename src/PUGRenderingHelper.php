@@ -87,6 +87,7 @@ class PUGRenderingHelper
     {
         $o = PUGOptions::getOptions();
 
+
         return new Pug($o);
     }
 
@@ -609,8 +610,10 @@ class PUGRenderingHelper
 
 
         $pug = self::getPug();
-        $html = $pug->renderFile(self::getPUGPath() . '/' . $template . '.pug', $data);
 
+        TualoApplication::set('inside_pug', true);
+        $html = $pug->renderFile(self::getPUGPath() . '/' . $template . '.pug', $data);
+        TualoApplication::set('inside_pug', false);
 
         if (empty(trim(chop($html)))) {
             return $html;
@@ -702,7 +705,7 @@ class PUGRenderingHelper
             'keysort' => PUG2::keysort(),
         ];
         $data = array_merge($data, $fn);
-        TualoApplication::set('inside_pug', true);
+
         TualoApplication::timing("render before", '');
 
 
@@ -737,7 +740,9 @@ class PUGRenderingHelper
 
         try {
             $data['ds'] = DSTable::init($db);
+            TualoApplication::set('inside_pug', true);
             $html = $pug->renderFile(self::getPUGPath() . '/' . $template . '.pug', $data);
+            TualoApplication::set('inside_pug', false);
             TualoApplication::timing("render after", '');
             if (empty(trim(chop($html)))) {
                 return $html;

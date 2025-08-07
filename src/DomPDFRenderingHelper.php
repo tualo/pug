@@ -5,6 +5,7 @@ namespace Tualo\Office\PUG;
 use Tualo\Office\Basic\TualoApplication;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use Ramsey\Uuid\Uuid;
 
 class DomPDFRenderingHelper
 {
@@ -52,7 +53,7 @@ class DomPDFRenderingHelper
                 if (!file_exists(TualoApplication::get('tempPath') . '/' . $bulkpath . '')) mkdir(TualoApplication::get('tempPath') . '/' . $bulkpath . '');
                 if (!file_exists(TualoApplication::get('tempPath') . '/' . $bulkpath . '/.htfiles')) file_put_contents(TualoApplication::get('tempPath') . '/' . $bulkpath . '/.htfiles', json_encode(array()));
                 $files = json_decode(file_get_contents(TualoApplication::get('tempPath') . '/' . $bulkpath . '/.htfiles'), true);
-                $request['save'] = TualoApplication::get('tempPath') . '/' . $bulkpath . '/' . generateGUID(10) . '.pdf';
+                $request['save'] = TualoApplication::get('tempPath') . '/' . $bulkpath . '/' . Uuid::uuid4()->toString() . '.pdf';
             }
 
             foreach ($idList as $id) {
@@ -79,11 +80,15 @@ class DomPDFRenderingHelper
                 //$dompdf->set_option("isPhpEnabled", true);
 
 
+
                 $dompdf->loadHtml($html);
+
+
                 $dompdf->setPaper('A4', $orientation); //'portrait');
 
 
                 $dompdf->render();
+
 
 
                 DomPDFRenderingHelper::injectPageCount($dompdf);

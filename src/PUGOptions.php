@@ -49,12 +49,13 @@ class PUGOptions
 
     public static function getOptions(): array
     {
+
         $o = [
             'pretty' => self::config('pretty', '1') == '1',
             'debug' => self::config('debug', '0') == '1',
             'cache' => self::config('cache', dirname(self::getPUGPath()) . '/cache'),
             'basedir' => self::config('basedir', self::getPUGPath()),
-            'execution_max_time' => intval(self::config('basedir', '30000')),
+            'execution_max_time' => intval(self::config('execution_max_time', '30000')),
             'upToDateCheck' => self::config('upToDateCheck', '1') == '1',
             'enable_profiler' => self::config('enable_profiler', '0') == '1',
             'profiler' => [
