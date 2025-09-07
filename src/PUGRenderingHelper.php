@@ -702,6 +702,7 @@ class PUGRenderingHelper
             'datetime' => self::datetime(),
             'base64file' => PUG2::base64file(),
             'dsfiles' => PUG2::dsfiles(),
+            'barcode' =>  PUG2::barcode(),
             'keysort' => PUG2::keysort(),
         ];
         $data = array_merge($data, $fn);
