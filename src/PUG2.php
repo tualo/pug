@@ -97,8 +97,16 @@ class PUG2
             'relocate' => new Relocate(),
             'keysort' => self::keysort(),
             'dstable' =>  self::dstable(),
+            'barcode' =>  self::barcode(),
             'pug' =>  self::pugFN(),
         ]);
+    }
+
+    public static function barcode(): callable
+    {
+        return function ($type, $data): PUG2 {
+            return Barcode::get($type, $data);
+        };
     }
 
     public static function dsfiles(): callable

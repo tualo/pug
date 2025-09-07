@@ -104,6 +104,7 @@ class PUG
             'dstable' => self::dstable(),
             'dsfiles' => self::dsfiles(),
             'keysort' => self::keysort(),
+            'barcode' => self::barcode(),
             'baseURL' => $url,
             'pug' => self::pugFN(),
         ];
@@ -114,6 +115,13 @@ class PUG
     {
         return function ($options = []): PUG2 {
             return new PUG2(TualoApplication::get('session')->getDB(), $options);
+        };
+    }
+
+    public static function barcode(): callable
+    {
+        return function ($type, $data): PUG2 {
+            return Barcode::get($type, $data);
         };
     }
 
