@@ -104,7 +104,7 @@ class PUG2
 
     public static function barcode(): callable
     {
-        return function ($type, $data): PUG2 {
+        return function ($type, $data): string {
             return Barcode::get($type, $data);
         };
     }
