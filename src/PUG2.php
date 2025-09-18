@@ -5,6 +5,7 @@ namespace Tualo\Office\PUG;
 use Tualo\Office\Basic\TualoApplication;
 use Pug\Pug as P;
 use Tualo\Office\DS\DSTable as T;
+use Michelf\MarkdownExtra;
 
 class PUG2
 {
@@ -98,8 +99,23 @@ class PUG2
             'keysort' => self::keysort(),
             'dstable' =>  self::dstable(),
             'barcode' =>  self::barcode(),
+            'markdown' =>  self::markdownfn(),
             'pug' =>  self::pugFN(),
         ]);
+    }
+
+    public static function markdownfn(): mixed
+    {
+        return function (string|null $markdownText): string {
+            if (is_null($markdownText))  return '';
+            $result  = MarkdownExtra::defaultTransform($markdownText);
+            if ((strpos($result, "<p>") === 0)
+                && (substr(trim($result), 3, -4) === '</p>')
+            ) {
+                $result = substr(trim($result), 3, -4);
+            }
+            return $result;
+        };
     }
 
     public static function barcode(): callable

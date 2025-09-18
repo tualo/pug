@@ -105,6 +105,7 @@ class PUG
             'dsfiles' => self::dsfiles(),
             'keysort' => self::keysort(),
             'barcode' => self::barcode(),
+            'markdown' =>  PUG2::markdownfn(),
             'baseURL' => $url,
             'pug' => self::pugFN(),
         ];

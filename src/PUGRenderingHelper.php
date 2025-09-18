@@ -703,6 +703,7 @@ class PUGRenderingHelper
             'base64file' => PUG2::base64file(),
             'dsfiles' => PUG2::dsfiles(),
             'barcode' =>  PUG2::barcode(),
+            'markdown' =>  PUG2::markdownfn(),
             'keysort' => PUG2::keysort(),
         ];
         $data = array_merge($data, $fn);
