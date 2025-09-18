@@ -14,22 +14,23 @@ class PDF2
         string $tablename,
         string $template,
         string $id
-    ): string
-    {
+    ): string {
         if (App::configuration('browsershot', 'remote_service', '') == '') {
-            $pug = new PUG2(App::get('session')->getDB());
+
+            $pug = new PUG2(App::get('session')->getDB(), PUGOptions::getOptions());
             $data = T::instance($tablename)
-                    ->f('__id','=',$id)
-                    ->read()
-                    ->get();
+                ->f('__id', '=', $id)
+                ->read()
+                ->get();
             $html = $pug->render($template, $data);
             return self::useDomPDF($html);
         } else {
-            return self::useRemoteService($tablename,$template, $id);
+            return self::useRemoteService($tablename, $template, $id);
         }
-
     }
-    
+
+
+
 
     private static function useDomPDF($html): string
     {
@@ -51,7 +52,7 @@ class PDF2
         return $dompdf->output();
     }
 
-    private static function useRemoteService($tablename,$template,$id): string
+    private static function useRemoteService($tablename, $template, $id): string
     {
         $db = App::get('session')->getDB();
         $pdf = '';
@@ -59,9 +60,9 @@ class PDF2
         if (isset($_SESSION['tualoapplication']['oauth'])) {
             $session = App::get('session');
             $token = $session->registerOAuth(
-                $params = ['cmp' => 'cmp_ds'], 
-                $force = true, 
-                $anyclient = false, 
+                $params = ['cmp' => 'cmp_ds'],
+                $force = true,
+                $anyclient = false,
                 $path = '/pug2html/' . $tablename . '/' . $template . '/' . $id
             );
             $session->oauthSingleUse($token);
