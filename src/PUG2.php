@@ -88,7 +88,7 @@ class PUG2
             $stylesheets = [];
         TualoApplication::set('inside_pug', true);
 
-        return $pug->renderFile($template, [
+        $d = [
             'data' => $data,
             'stylesheets' => $stylesheets,
             'datetime' => self::datetime(),
@@ -101,8 +101,41 @@ class PUG2
             'barcode' =>  self::barcode(),
             'markdown' =>  self::markdownfn(),
             'pug' =>  self::pugFN(),
-        ]);
+            'array_by_key' =>  self::array_by_key(),
+            'array_has_by_key' =>  self::array_has_by_key(),
+            ...$data
+        ];
+
+
+        return $pug->renderFile($template, $d);
     }
+
+    public static function array_by_key(): mixed
+    {
+        return function (array $data, string $keyToMap, string $separator = ' '): string {
+            $result = [];
+            foreach ($data as $item) {
+                if (array_key_exists($keyToMap, $item)) {
+                    $result[] = $item[$keyToMap];
+                }
+            }
+
+            return implode($separator, $result);
+        };
+    }
+
+    public static function array_has_by_key(): mixed
+    {
+        return function (array $data, string $key, string $value = ''): bool {
+            foreach ($data as $item) {
+                if (array_key_exists($key, $item) && $item[$key] == $value) {
+                    return true;
+                }
+            }
+            return false;
+        };
+    }
+
 
     public static function markdownfn(): mixed
     {
