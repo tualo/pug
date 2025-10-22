@@ -106,6 +106,15 @@ class PUG2
             ...$data
         ];
 
+        $classes = get_declared_classes();
+        foreach ($classes as $cls) {
+            $class = new \ReflectionClass($cls);
+            if ($class->implementsInterface('Tualo\Office\PUG\IPUGFunction')) {
+                $info = $cls::register();
+                $d[$info['pug_name']] = $info['function'];
+            }
+        }
+
 
         return $pug->renderFile($template, $d);
     }

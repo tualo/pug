@@ -10,3 +10,4 @@ require_once "Routes/HTML.php";
 require_once "Routes/Pug2.php";
 require_once "Checks/Paths.php";
 require_once "ValueRenderer.php";
+require_once "IPUGFunction.php";
