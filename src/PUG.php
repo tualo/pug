@@ -109,6 +109,16 @@ class PUG
             'baseURL' => $url,
             'pug' => self::pugFN(),
         ];
+
+        $classes = get_declared_classes();
+        foreach ($classes as $cls) {
+            $class = new \ReflectionClass($cls);
+            if ($class->implementsInterface('Tualo\Office\PUG\IPUGFunction')) {
+                $info = $cls::register();
+                $o[$info['pug_name']] = $info['function'];
+            }
+        }
+
         return array_merge($o, $data);
     }
 
