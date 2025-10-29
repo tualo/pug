@@ -11,7 +11,7 @@ use Tualo\Office\PUG\PUGRenderingHelper;
 use Tualo\Office\PUG\PDF as P;
 use Tualo\Office\PUG\PUG as PUG;
 
-class PDF implements IRoute
+class PDF extends \Tualo\Office\Basic\RouteWrapper
 {
     public static function register()
     {

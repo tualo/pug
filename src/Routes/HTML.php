@@ -8,7 +8,7 @@ use Tualo\Office\Basic\Route;
 use Tualo\Office\Basic\IRoute;
 use Tualo\Office\PUG\PUG as PUG;
 
-class HTML implements IRoute
+class HTML extends \Tualo\Office\Basic\RouteWrapper
 {
     public static function register()
     {
