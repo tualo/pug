@@ -66,6 +66,18 @@ class PUGOptions
             ]
         ];
 
+        $o['on_render'] = function (\Phug\Renderer\Event\RenderEvent $event) {
+
+            $parameters = $event->getParameters();
+            try {
+                $parameters['current_pug_file'] = basename($event->getPath());
+            } catch (\Exception $e) {
+                $parameters['current_pug_file'] = 'unknown';
+            }
+            // Set new parameters
+            $event->setParameters($parameters);
+        };
+
 
         if (isset($GLOBALS['pug_formats'])) {
             $o['formats'] = $GLOBALS['pug_formats'];

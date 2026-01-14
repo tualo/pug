@@ -57,6 +57,7 @@ class PUG2
         $o = array_merge($o, $options);
 
 
+
         return new P($o);
     }
 
