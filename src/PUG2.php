@@ -204,7 +204,7 @@ class PUG2
                 function ($t) {
                     return $t['template'];
                 },
-                $this->db->direct('select template from ds_pug_templates where id in (' . implode(',', array_map(function ($t) {
+                $this->db->direct('select template,id from ds_pug_templates where id in (' . implode(',', array_map(function ($t) {
                     return '"' . $t . '"';
                 }, $templates)) . ') order by id')
             )));

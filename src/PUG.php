@@ -77,7 +77,7 @@ class PUG
                 function ($t) {
                     return $t['template'];
                 },
-                $db->direct('select template from ds_pug_templates where id in (' . implode(',', array_map(function ($t) {
+                $db->direct('select template,id from ds_pug_templates where id in (' . implode(',', array_map(function ($t) {
                     return '"' . $t . '"';
                 }, $templates)) . ') order by id')
             )));
