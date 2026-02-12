@@ -1,14 +1,18 @@
 <?php
+
 namespace Tualo\Office\PUG;
+
 use Tualo\Office\Basic\TualoApplication;
 use Tualo\Office\DS\DataRenderer;
 use Picqer\Barcode\BarcodeGeneratorPNG;
 use chillerlan\QRCode\QRCode;
 
-class Barcode {
+class Barcode
+{
 
-    public static function get($type,$data){
-        if ($type=='qr'){
+    public static function get($type, $data)
+    {
+        if ($type == 'qr') {
             return (new QRCode)->render($data);
         }
         $generator = new BarcodeGeneratorPNG();
@@ -43,7 +47,7 @@ class Barcode {
         $types['c11'] = $generator::TYPE_CODE_11;
         $types['pharma'] = $generator::TYPE_PHARMA_CODE;
         $types['pharma-2'] = $generator::TYPE_PHARMA_CODE_TWO_TRACKS;
-        
+
         if (!isset($types[$type])) throw new \Exception('Barcode type not found');
         return 'data:image/png;base64,' . base64_encode($generator->getBarcode($data, $types[$type]));
     }

@@ -66,17 +66,46 @@ class PUGOptions
             ]
         ];
 
+        /*
         $o['on_render'] = function (\Phug\Renderer\Event\RenderEvent $event) {
 
             $parameters = $event->getParameters();
             try {
-                $parameters['current_pug_file'] = basename($event->getPath());
+                // var_dump($event);
+                $parameters['called_pug_file'] =   basename($event->getPath()); // $event->getName(); // basename($event->getPath());
             } catch (\Exception $e) {
-                $parameters['current_pug_file'] = 'unknown';
+                $parameters['called_pug_file'] = 'unknown';
             }
             // Set new parameters
             $event->setParameters($parameters);
         };
+
+        $o['on_node'] = function (\Phug\Compiler\Event\NodeEvent $event) {
+
+            try {
+                if (get_class($event->getNode()) == "Phug\Parser\Node\ImportNode") {
+                    $name = ($event->getNode()->getName() . ' ' . $event->getNode()->getPath());
+                    // $event->getCompiler()->prependCode("// test");
+                    // $event->getCompiler(); // ->prependCode("\$x__pug_file = \"{$name}\"; \n");
+                }
+                //\$__pug_file = \"{$name}\"; \n");
+            } catch (\Exception $e) {
+            }
+        };
+        $o['on_output'] = function (\Phug\Compiler\Event\OutputEvent $event) {
+
+            try {
+                $name = basename($event->getCompileEvent()->getPath());
+                / *
+                if (get_class($event->getNode()) == "Phug\Parser\Node\ImportNode") {
+                    $name = $event->getNode()->getPath();
+                    $event->prependCode("\$__pug_file = \"{$name}; \n");
+                }
+                    * /
+            } catch (\Exception $e) {
+            }
+        };
+        */
 
 
         if (isset($GLOBALS['pug_formats'])) {

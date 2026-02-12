@@ -95,6 +95,7 @@ class PUG2
             'datetime' => self::datetime(),
             'base64file' => self::base64file(),
             'dsfiles' => self::dsfiles(),
+            'checksum' => self::checksum(),
             'request' => new Request(),
             'relocate' => new Relocate(),
             'keysort' => self::keysort(),
@@ -193,6 +194,20 @@ class PUG2
     {
         return function ($tn): \Tualo\Office\DS\DSTable {
             return \Tualo\Office\DS\DSTable::instance($tn);
+        };
+    }
+
+    public static function checksum(): callable
+    {
+        return function (...$templates): string {
+            return md5(implode('', array_map(
+                function ($t) {
+                    return $t['template'];
+                },
+                $this->db->direct('select template from ds_pug_templates where id in (' . implode(',', array_map(function ($t) {
+                    return '"' . $t . '"';
+                }, $templates)) . ') order by id')
+            )));
         };
     }
 
