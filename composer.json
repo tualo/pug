@@ -26,5 +26,5 @@
     "picqer/php-barcode-generator": "~3.2.2",
     "michelf/php-markdown": "^2.0.0"
   },
-  "version": "1.3.9"
+  "version": "1.3.10"
 }

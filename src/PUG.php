@@ -69,6 +69,21 @@ class PUG
         };
     }
 
+    public static function checksum(): callable
+    {
+        return function (...$templates): string {
+            $db = TualoApplication::get('session')->getDB();
+            return md5(implode('', array_map(
+                function ($t) {
+                    return $t['template'];
+                },
+                $db->direct('select template from ds_pug_templates where id in (' . implode(',', array_map(function ($t) {
+                    return '"' . $t . '"';
+                }, $templates)) . ') order by id')
+            )));
+        };
+    }
+
     public static function keysort(): callable
     {
         return function (array $data, string $key, string $direction = 'asc'): array {
@@ -103,6 +118,7 @@ class PUG
             'base64file' => self::base64file(),
             'dstable' => self::dstable(),
             'dsfiles' => self::dsfiles(),
+            'checksum' => self::checksum(),
             'keysort' => self::keysort(),
             'barcode' => self::barcode(),
             'markdown' =>  PUG2::markdownfn(),
