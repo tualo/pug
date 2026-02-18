@@ -145,6 +145,7 @@ class PUG
         };
     }
 
+
     public static function barcode(): callable
     {
         return function ($type, $data): string {
