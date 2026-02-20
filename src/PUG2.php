@@ -102,6 +102,7 @@ class PUG2
             'dstable' =>  self::dstable(),
             'barcode' =>  self::barcode(),
             'markdown' =>  self::markdownfn(),
+            'setqueryparameter' => self::setQueryParameter(),
             'pug' =>  self::pugFN(),
             'array_by_key' =>  self::array_by_key(),
             'array_has_by_key' =>  self::array_has_by_key(),
@@ -166,6 +167,14 @@ class PUG2
     {
         return function ($type, $data): string {
             return Barcode::get($type, $data);
+        };
+    }
+
+
+    public static function setQueryParameter(): callable
+    {
+        return function (array $param): bool {
+            return TualoApplication::setDatabaseRequestParameter($param);
         };
     }
 

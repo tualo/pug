@@ -122,6 +122,7 @@ class PUG
             'keysort' => self::keysort(),
             'barcode' => self::barcode(),
             'markdown' =>  PUG2::markdownfn(),
+            'setqueryparameter' => self::setQueryParameter(),
             'baseURL' => $url,
             'pug' => self::pugFN(),
         ];
@@ -145,6 +146,12 @@ class PUG
         };
     }
 
+    public static function setQueryParameter(): callable
+    {
+        return function (array $param): bool {
+            return TualoApplication::setDatabaseRequestParameter($param);
+        };
+    }
 
     public static function barcode(): callable
     {
