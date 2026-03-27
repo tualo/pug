@@ -106,6 +106,7 @@ class PUG2
             'pug' =>  self::pugFN(),
             'array_by_key' =>  self::array_by_key(),
             'array_has_by_key' =>  self::array_has_by_key(),
+            'distinctList' => self::distinctList(),
             ...$data
         ];
 
@@ -121,6 +122,19 @@ class PUG2
 
         return $pug->renderFile($template, $d);
     }
+
+    public static function distinctList(): mixed
+    {
+        return function (array $data, string $key): array {
+            $result = [];
+            foreach ($data as $item) {
+                $result[] = $item[$key];
+            }
+            return array_unique($result);
+        };
+    }
+
+
 
     public static function array_by_key(): mixed
     {
