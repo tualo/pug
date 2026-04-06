@@ -100,6 +100,8 @@ class PUG
 
     public static function data($data)
     {
+
+
         if (isset($_SESSION['pug_session'])) {
             $data = array_merge(
                 [
