@@ -703,6 +703,8 @@ class PUGRenderingHelper
             'base64file' => PUG2::base64file(),
             'dsfiles' => PUG2::dsfiles(),
             'barcode' =>  PUG2::barcode(),
+            'qrcode' =>  PUG2::qrcode(),
+
             'markdown' =>  PUG2::markdownfn(),
             'keysort' => PUG2::keysort(),
         ];
