@@ -101,6 +101,7 @@ class PUG2
             'keysort' => self::keysort(),
             'dstable' =>  self::dstable(),
             'barcode' =>  self::barcode(),
+            'qrcode' => self::qrcode(),
             'markdown' =>  self::markdownfn(),
             'setqueryparameter' => self::setQueryParameter(),
             'pug' =>  self::pugFN(),
@@ -121,6 +122,13 @@ class PUG2
 
 
         return $pug->renderFile($template, $d);
+    }
+
+    public static function qrcode(): callable
+    {
+        return function ($data): string {
+            return Barcode::qr($data);
+        };
     }
 
     public static function distinctList(): mixed

@@ -162,6 +162,12 @@ class PUG
         };
     }
 
+    public static function qrcode(): callable
+    {
+        return function ($data): string {
+            return Barcode::qr($data);
+        };
+    }
 
     public static function render(string $template, array $data = [], array $options = []): string
     {
