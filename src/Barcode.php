@@ -5,10 +5,18 @@ namespace Tualo\Office\PUG;
 use Tualo\Office\Basic\TualoApplication;
 use Tualo\Office\DS\DataRenderer;
 use Picqer\Barcode\BarcodeGeneratorPNG;
-use chillerlan\QRCode\QRCode;
+use chillerlan\QRCode\{QRCode, QROptions};
+use chillerlan\QRCode\Data\QRMatrix;
+use chillerlan\QRCode\Output\QRMarkupSVG;
 
 class Barcode
 {
+
+    public static function qr($data)
+    {
+        $options = new QROptions();
+        return (new QRCode($options))->render($data);
+    }
 
     public static function get($type, $data)
     {
