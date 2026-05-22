@@ -123,6 +123,7 @@ class PUG
             'checksum' => self::checksum(),
             'keysort' => self::keysort(),
             'barcode' => self::barcode(),
+            'qrcode' => self::qrcode(),
             'markdown' =>  PUG2::markdownfn(),
             'setqueryparameter' => self::setQueryParameter(),
             'baseURL' => $url,

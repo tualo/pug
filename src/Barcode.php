@@ -14,14 +14,19 @@ class Barcode
 
     public static function qr($data)
     {
-        $options = new QROptions();
+        $options = new QROptions([
+            'version'            => 5,
+            'scale'              => 5,
+            'imageTransparent'   => true,
+            'transparencyColor'  => [255, 255, 255], // Usually white
+        ]);
         return (new QRCode($options))->render($data);
     }
 
     public static function get($type, $data)
     {
         if ($type == 'qr') {
-            return (new QRCode)->render($data);
+            return self::qr($data);
         }
         $generator = new BarcodeGeneratorPNG();
         $types = array();
