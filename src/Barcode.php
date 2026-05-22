@@ -16,6 +16,7 @@ class Barcode
     {
         $options = new QROptions([
             'imageTransparent'   => true,
+            'transparencyColor' => [255, 255, 255],
             'outputType'        => QRCode::OUTPUT_MARKUP_SVG,
         ]);
         return (new QRCode($options))->render($data);
