@@ -17,7 +17,7 @@ class Barcode
         $options = new QROptions([
             'imageTransparent'   => true,
             'outputBase64'      => false, // Verhindert die Ausgabe als Base64-String
-            'transparencyColor' => [255, 255, 255],
+            'transparencyColor' => [255, 255, 255, 0],
             'outputType'        => QRCode::OUTPUT_MARKUP_SVG,
         ]);
         return (new QRCode($options))->render($data);
