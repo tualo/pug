@@ -12,7 +12,7 @@ use chillerlan\QRCode\Output\QRMarkupSVG;
 class Barcode
 {
 
-    public static function qr(string $data, array $options = [])
+    public static function qr(string $data, array $optionsArray = [])
     {
         if (empty($options)) {
             $options = new QROptions([
@@ -22,7 +22,7 @@ class Barcode
                 'outputType'        => QRCode::OUTPUT_MARKUP_SVG,
             ]);
         } else {
-            $options = new QROptions([]);
+            $options = new QROptions($optionsArray);
         }
         return (new QRCode($options))->render($data);
     }
