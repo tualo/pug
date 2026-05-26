@@ -165,8 +165,8 @@ class PUG
 
     public static function qrcode(): callable
     {
-        return function ($data): string {
-            return Barcode::qr($data);
+        return function ($data, $options = []): string {
+            return Barcode::qr($data, $options);
         };
     }
 

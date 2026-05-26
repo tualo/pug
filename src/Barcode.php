@@ -12,14 +12,18 @@ use chillerlan\QRCode\Output\QRMarkupSVG;
 class Barcode
 {
 
-    public static function qr($data)
+    public static function qr(string $data, array $options = [])
     {
-        $options = new QROptions([
-            'imageTransparent'   => true,
-            'outputBase64'      => false, // Verhindert die Ausgabe als Base64-String
-            'transparencyColor' => [255, 255, 255, 0],
-            'outputType'        => QRCode::OUTPUT_MARKUP_SVG,
-        ]);
+        if (empty($options)) {
+            $options = new QROptions([
+                'imageTransparent'   => true,
+                'outputBase64'      => false, // Verhindert die Ausgabe als Base64-String
+                'transparencyColor' => [255, 255, 255, 0],
+                'outputType'        => QRCode::OUTPUT_MARKUP_SVG,
+            ]);
+        } else {
+            $options = new QROptions([]);
+        }
         return (new QRCode($options))->render($data);
     }
 
