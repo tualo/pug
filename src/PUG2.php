@@ -134,9 +134,15 @@ class PUG2
 
     public static function distinctList(): mixed
     {
-        return function (array $data, string $key): array {
+        return function (array $data, string $key, bool $nullAsEmptyString = false): array {
             $result = [];
             foreach ($data as $item) {
+                if ($nullAsEmptyString && !isset($item[$key])) {
+                    $item[$key] = '';
+                }
+                if (!isset($item[$key])) {
+                    continue;
+                }
                 $result[] = $item[$key];
             }
             return array_unique($result);
@@ -145,9 +151,12 @@ class PUG2
 
     public static function filterKeyValue(): mixed
     {
-        return function (array $data, string $key, string $value): array {
+        return function (array $data, string $key, string $value, bool $nullAsEmptyString = false): array {
             $result = [];
             foreach ($data as $item) {
+                if ($nullAsEmptyString && !isset($item[$key])) {
+                    $item[$key] = '';
+                }
                 if (isset($item[$key]) && $item[$key] == $value) {
                     $result[] = $item;
                 }
