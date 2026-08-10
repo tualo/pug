@@ -128,6 +128,9 @@ class PUG
             'setqueryparameter' => self::setQueryParameter(),
             'baseURL' => $url,
             'pug' => self::pugFN(),
+            'array_by_key' =>  PUG2::array_by_key(),
+            'array_has_by_key' =>  PUG2::array_has_by_key(),
+            'distinctList' => PUG2::distinctList(),
         ];
 
         $classes = get_declared_classes();
