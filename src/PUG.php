@@ -131,6 +131,7 @@ class PUG
             'array_by_key' =>  PUG2::array_by_key(),
             'array_has_by_key' =>  PUG2::array_has_by_key(),
             'distinctList' => PUG2::distinctList(),
+            'filterKeyValue' => PUG2::filterKeyValue(),
         ];
 
         $classes = get_declared_classes();
