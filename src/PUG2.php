@@ -108,6 +108,7 @@ class PUG2
             'array_by_key' =>  self::array_by_key(),
             'array_has_by_key' =>  self::array_has_by_key(),
             'distinctList' => self::distinctList(),
+            'filterKeyValue' => self::filterKeyValue(),
             ...$data
         ];
 
@@ -139,6 +140,19 @@ class PUG2
                 $result[] = $item[$key];
             }
             return array_unique($result);
+        };
+    }
+
+    public static function filterKeyValue(): mixed
+    {
+        return function (array $data, string $key, string $value): array {
+            $result = [];
+            foreach ($data as $item) {
+                if (isset($item[$key]) && $item[$key] == $value) {
+                    $result[] = $item;
+                }
+            }
+            return $result;
         };
     }
 
