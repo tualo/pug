@@ -705,6 +705,8 @@ class PUGRenderingHelper
             'barcode' =>  PUG2::barcode(),
             'qrcode' =>  PUG2::qrcode(),
 
+            'distinctList' => PUG2::distinctList(),
+            'filterKeyValue' => PUG2::filterKeyValue(),
             'markdown' =>  PUG2::markdownfn(),
             'keysort' => PUG2::keysort(),
         ];
