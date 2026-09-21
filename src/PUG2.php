@@ -95,6 +95,8 @@ class PUG2
             'datetime' => self::datetime(),
             'base64file' => self::base64file(),
             'dsfiles' => self::dsfiles(),
+            'dsfile' => self::dsfile(),
+            'dsfiles' => self::dsfiles(),
             'checksum' => self::checksum(),
             'request' => new Request(),
             'relocate' => new Relocate(),
@@ -227,6 +229,13 @@ class PUG2
     {
         return function (string $tablename): \Tualo\Office\DS\DSFiles {
             return \Tualo\Office\DS\DSFiles::instance($tablename);
+        };
+    }
+
+    public static function dsfile(): callable
+    {
+        return function (string $tablename): \Tualo\Office\DS\DSFile {
+            return \Tualo\Office\DS\DSFile::instance($tablename);
         };
     }
 
