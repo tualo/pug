@@ -120,6 +120,7 @@ class PUG
             'base64file' => self::base64file(),
             'dstable' => self::dstable(),
             'dsfiles' => self::dsfiles(),
+            'dsfile' => PUG2::dsfile(),
             'checksum' => self::checksum(),
             'keysort' => self::keysort(),
             'barcode' => self::barcode(),
