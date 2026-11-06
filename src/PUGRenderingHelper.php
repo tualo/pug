@@ -755,7 +755,7 @@ class PUGRenderingHelper
             }
         } catch (\Exception $e) {
             $html = $e->getMessage();
-            TualoApplication::logger('error')->error($e->getMessage());
+            TualoApplication::logger('error')->error($e->getMessage(), []);
         }
 
 

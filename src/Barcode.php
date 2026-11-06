@@ -14,12 +14,12 @@ class Barcode
 
     public static function qr(string $data, array $optionsArray = [])
     {
-        if (empty($options)) {
+        if (empty($optionsArray)) {
             $options = new QROptions([
                 'imageTransparent'   => true,
                 'outputBase64'      => false, // Verhindert die Ausgabe als Base64-String
                 'transparencyColor' => [255, 255, 255, 0],
-                'outputType'        => QRCode::OUTPUT_MARKUP_SVG,
+                'outputInterface'   => QRMarkupSVG::class,
             ]);
         } else {
             $options = new QROptions($optionsArray);
