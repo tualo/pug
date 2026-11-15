@@ -96,7 +96,6 @@ class PUG2
             'base64file' => self::base64file(),
             'dsfiles' => self::dsfiles(),
             'dsfile' => self::dsfile(),
-            'dsfiles' => self::dsfiles(),
             'checksum' => self::checksum(),
             'request' => new Request(),
             'relocate' => new Relocate(),
